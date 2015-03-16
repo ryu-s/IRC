@@ -19,41 +19,94 @@ namespace Irc4
 
         private MyLibrary.MySocket.SplitBuffer splitBuffer;
 
-        public event ReceiveEventHandler ReceiveEvent;
 
-        private string NewLine = "\r\n";
+        /// <summary>
+        /// 接続に成功した。
+        /// </summary>
+        public event EventHandler ConnectSuccess;
+        /// <summary>
+        /// 何か受け取った。
+        /// </summary>
+        public event ReceiveEventHandler ReceiveEvent;
+        /// <summary>
+        /// 行末文字。
+        /// </summary>
+        private string LineTerminator = "\r\n";
         /// <summary>
         /// 
         /// </summary>
         public Server()
         {
             socket = new MyLibrary.MySocket.SocketAsync();
-            splitBuffer = new MyLibrary.MySocket.SplitBuffer(this, NewLine);
+            splitBuffer = new MyLibrary.MySocket.SplitBuffer(this, LineTerminator);
             splitBuffer.AddedEvent += splitBuffer_AddedEvent;
             infoModified = new ServerInfo();
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="info"></param>
         public void SetInfo(ServerInfo info)
         {
             CopyInfo(info, infoModified);
         }
+        public ServerInfo GetInfo()
+        {
+            var info = new ServerInfo();
+            CopyInfo(infoModified, info);
+            return info;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dst"></param>
         public void CopyInfo(ServerInfo src, ServerInfo dst)
         {
             dst.DisplayName = src.DisplayName;
             dst.Hostname = src.Hostname;
             dst.Port = src.Port;
+            dst.Nickname = src.Nickname;
+            dst.Username = src.Username;
+            dst.Realname = src.Realname;
         }
+        /// <summary>
+        /// 表示名
+        /// </summary>
         public new string DisplayName
         {
             get
             {
-                return base.DisplayName;
+                if (this.IsConnected)
+                    return base.DisplayName;
+                else
+                    return infoModified.DisplayName;
             }
             set
             {
                 infoModified.DisplayName = value;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public new string Hostname
+        {
+            get
+            {
+                if (this.IsConnected)
+                    return base.Hostname;
+                else
+                    return infoModified.Hostname;
+            }
+            set
+            {
+                infoModified.Hostname = value;
+            }
+        }
+        /// <summary>
+        /// 接続済みか。
+        /// </summary>
         public bool IsConnected
         {
             get
@@ -61,9 +114,16 @@ namespace Irc4
                 return (socket != null && socket.IsConnected);
             }
         }
-        public void ExceptionHandler(MyLibrary.LogLevel level, string message, Exception ex)
+        /// <summary>
+        /// 例外処理。
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="message"></param>
+        /// <param name="ex"></param>
+        private void ExceptionHandler(MyLibrary.LogLevel level, string message, Exception ex)
         {
             var additional = "";
+            var logPath = @"C:\Irc4Exception.txt";
             if (ex is SocketException)
                 additional = ((SocketException)ex).SocketErrorCode.ToString();
 
@@ -77,12 +137,12 @@ namespace Irc4
                 + ex.StackTrace + Environment.NewLine
                 + "===================================================" + Environment.NewLine
                 ;
-            using (var sr = new System.IO.StreamWriter(@"C:\Irc4Exception.txt", true))
+            using (var sr = new System.IO.StreamWriter(logPath, true))
             {
                 sr.Write(s);
             }
         }
-        public event EventHandler ConnectSuccess;
+
         /// <summary>
         /// 
         /// </summary>
@@ -129,7 +189,7 @@ namespace Irc4
                 return;
 
             //コマンドの送信に成功したらtrueが返ってくるから反転させる必要がある。
-            fatalErrorOccured = !await this.SendCmd("NICK mycktai\r\nUSER hosu 8 * :ryruid\r\n");
+            fatalErrorOccured = !await this.SendCmd(string.Format("NICK {0}\r\nUSER {1} 8 * :{2}\r\n", this.Nickname, this.Username, this.Realname));
             if (fatalErrorOccured)
                 return;
             if (ConnectSuccess != null)
@@ -313,6 +373,9 @@ namespace Irc4
         /// </summary>
         string DisplayName { get; set; }
     }
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     public class ServerInfo : IInfo
     {
@@ -320,6 +383,16 @@ namespace Irc4
 
         public string Hostname { get; set; }
         public int Port { get; set; }
+        /// <summary>
+        /// コードページ。Encodingだとシリアライズできない。確か。
+        /// </summary>
+        public int CodePage { get; set; }
+        
+        public string Password { get; set; }
+        public string Nickname { get; set; }
+        public string Username { get; set; }
+        public string Realname { get; set; }
+        public List<Channel> ChannelList { get; set; }
     }
     [Serializable]
     public class ChannelInfo : IInfo

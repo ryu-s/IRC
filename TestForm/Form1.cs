@@ -19,6 +19,9 @@ namespace Irc4TestForm
             server = new Irc4.Server();
             server.ConnectSuccess += server_ConnectSuccess;
             server.ReceiveEvent += server_ReceiveEvent;
+
+            textBox3.Text = "chat1.ustream.tv";
+            textBox4.Text = "irctest11";
         }
 
         void server_ConnectSuccess(object sender, EventArgs e)
@@ -42,13 +45,22 @@ namespace Irc4TestForm
 
         private async void button1_Click(object sender, EventArgs e)
         {
+            var host = textBox3.Text;
+            var nick = textBox4.Text;
             var serverInfo = new Irc4.ServerInfo();
-            serverInfo.DisplayName = "";
+            serverInfo.DisplayName = "USTREAM";
             //serverInfo.Hostname = "192.168.56.101";
-            serverInfo.Hostname = "chat1.ustream.tv";
+            serverInfo.Hostname = host;
+            serverInfo.Nickname = nick;
+            serverInfo.Username = "user11";
+            serverInfo.Realname = "real11";
             serverInfo.Port = 6667;
 
             server.SetInfo(serverInfo);
+            
+            var manager = new Irc4.IrcManager();
+            manager.AddServer(serverInfo);
+            manager.Save();
 
             await server.Connect();
 
@@ -63,6 +75,11 @@ namespace Irc4TestForm
         private async void button3_Click(object sender, EventArgs e)
         {
             await server.Disconnect();
+        }
+
+        private void btnUpdateHost_Click(object sender, EventArgs e)
+        {
+            server.Hostname = textBox3.Text;
         }
     }
 }
