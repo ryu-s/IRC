@@ -9,7 +9,9 @@ namespace Irc4Control
 {
     public class IrcDataGridView : DataGridView
     {
-        
+        /// <summary>
+        /// 
+        /// </summary>
         public IrcDataGridView()
         {
             //ダブルバッファ
@@ -24,7 +26,10 @@ namespace Irc4Control
             this.AllowUserToResizeRows = false;
             this.RowHeadersVisible = false;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
