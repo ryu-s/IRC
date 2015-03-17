@@ -14,12 +14,11 @@ namespace Irc4
         /// 一旦切断して、次の接続時に使用する情報。接続中には変更できない値が幾つかあるため。
         /// 設定の変更は常にここに入れる。Connect()の最初で本体の情報を更新する。
         /// </summary>
-        private ServerInfo infoModified;
+        private ServerInfo infoModified = new ServerInfo();
 
-        private MyLibrary.MySocket.SocketAsync socket;
+        private MyLibrary.MySocket.SocketAsync socket = new MyLibrary.MySocket.SocketAsync();
 
         private MyLibrary.MySocket.SplitBuffer splitBuffer;
-
 
         /// <summary>
         /// 接続に成功した。
@@ -44,16 +43,14 @@ namespace Irc4
         /// <summary>
         /// 行末文字。
         /// </summary>
-        private string LineTerminator = "\r\n";
+        private const string LineTerminator = "\r\n";
         /// <summary>
         /// 
         /// </summary>
         public Server()
-        {
-            socket = new MyLibrary.MySocket.SocketAsync();
+        {            
             splitBuffer = new MyLibrary.MySocket.SplitBuffer(this, LineTerminator);
-            splitBuffer.AddedEvent += splitBuffer_AddedEvent;
-            infoModified = new ServerInfo();
+            splitBuffer.AddedEvent += splitBuffer_AddedEvent;            
         }
         /// <summary>
         /// 
@@ -180,9 +177,7 @@ namespace Irc4
                 args.Message = message;
                 ExceptionInfo(this, args);
             }
-
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -232,6 +227,9 @@ namespace Irc4
                         break;
                     case SocketError.IsConnected:
                         message = "このソケットは接続済み。";
+                        break;
+                    case SocketError.AddressAlreadyInUse:
+                        message = "おそらく前回使用時にDisconnectAsync()を実行していない？";
                         break;
                     default:
                         message = "Not Implemented";
@@ -299,7 +297,11 @@ namespace Irc4
                     fatalErrorOccured = true;
                 }
                 if (fatalErrorOccured)
+                {
+                    //次回の接続に同じソケットを使うと"AdressAlreadyInUse"という例外が発生してしまう。それへの対処。
+                    socket.Reset();
                     return;
+                }
                 var s = hostEnc.GetString(buffer, 0, n);
                 sb.Append(s);
                 splitBuffer.Add(s.Replace("\0", ""));
@@ -314,6 +316,7 @@ namespace Irc4
                 switch (ex.SocketErrorCode)
                 {
                     case SocketError.NotConnected:
+                        message = "接続していないのに切断処理をしようとした。";
                         break;
                     default:
                         message = "Not Implemented";
