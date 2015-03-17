@@ -12,8 +12,6 @@ namespace Irc4TestForm
 {
     public partial class Form1 : Form
     {
-        Irc4.Server server;
-
         Irc4.IrcManager ircManager = new Irc4.IrcManager();
         Irc4.Server current;
         Dictionary<Irc4.Server, Irc4Control.MyDataTable> tableDic = new Dictionary<Irc4.Server, Irc4Control.MyDataTable>();
@@ -23,16 +21,19 @@ namespace Irc4TestForm
 
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
 
+            ircManager.ConnectSuccess += ircManager_ConnectSuccess;
+            ircManager.Disconnected += ircManager_Disconnected;
             ircManager.ReceiveEvent += ircManager_ReceiveEvent;
-            
-            server = new Irc4.Server();
-            server.ConnectSuccess += server_ConnectSuccess;
-            server.ReceiveEvent += server_ReceiveEvent;
-            server.ExceptionInfo += server_ExceptionInfo;
+            ircManager.InfoEvent += ircManager_InfoEvent;
+            ircManager.ExceptionInfo += ircManager_ExceptionInfo;
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             var server = comboBox1.SelectedItem as Irc4.Server;
@@ -49,6 +50,10 @@ namespace Irc4TestForm
                 btnDisconnect.Enabled = server.IsConnected;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="server"></param>
         void SetServerTextbox(Irc4.ServerInfo server)
         {
             var b = InvokeRequired;
@@ -56,6 +61,10 @@ namespace Irc4TestForm
             txtNickname.Text = server.Nickname;
             txtHost.Text = server.Hostname;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnLoad(EventArgs e)
         {
             //設定値の読み込み。
@@ -77,16 +86,41 @@ namespace Irc4TestForm
             comboBox1.Items.Add(server);
             tableDic.Add(server, new Irc4Control.MyDataTable());
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnClosing(CancelEventArgs e)
         {
             ircManager.Save();
             base.OnClosing(e);
         }
-        void server_ExceptionInfo(object sender, Irc4.IrcExceptionEventArgs e)
+        void ircManager_ExceptionInfo(object sender, Irc4.IrcExceptionEventArgs e)
         {
             Action action = () =>
             {
-                this.textBox1.Text += e.Message + Environment.NewLine;
+                this.textBox1.Text += string.Format("[{0}] {1}", e.serverChannel.DisplayName, e.Message) + Environment.NewLine;
+                this.textBox1.SelectionStart = this.textBox1.TextLength - 1;
+                this.textBox1.ScrollToCaret();
+
+                if (e.serverChannel is Irc4.Server)
+                {
+                    var server = (Irc4.Server)e.serverChannel;
+                    btnConnect.Enabled = !server.IsConnected;
+                    btnDisconnect.Enabled = server.IsConnected;
+                }
+            };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
+        }
+
+        void ircManager_InfoEvent(object sender, Irc4.IrcInfoEventArgs e)
+        {
+            Action action = () =>
+            {
+                this.textBox1.Text += string.Format("[{0}] {1}", e.serverChannel.DisplayName, e.Message) + Environment.NewLine;
                 this.textBox1.SelectionStart = this.textBox1.TextLength - 1;
                 this.textBox1.ScrollToCaret();
             };
@@ -95,11 +129,54 @@ namespace Irc4TestForm
             else
                 action();
         }
-
-        void server_ConnectSuccess(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void ircManager_ConnectSuccess(object sender, Irc4.IrcEventArgs e)
         {
-
+            Action action = () =>
+            {
+                if (e.serverChannel is Irc4.Server)
+                {
+                    var server = (Irc4.Server)e.serverChannel;
+                    if (server == current)
+                    {
+                        btnConnect.Enabled = !server.IsConnected;
+                        btnDisconnect.Enabled = server.IsConnected;
+                    }
+                }
+            };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
         }
+        void ircManager_Disconnected(object sender, Irc4.IrcEventArgs e)
+        {
+            Action action = () =>
+            {
+                if (e.serverChannel is Irc4.Server)
+                {
+                    var server = (Irc4.Server)e.serverChannel;
+                    if (server == current)
+                    {
+                        btnConnect.Enabled = !server.IsConnected;
+                        btnDisconnect.Enabled = server.IsConnected;
+                    }
+                }
+            };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void ircManager_ReceiveEvent(object sender, Irc4.IRCReceiveEventArgs e)
         {
             Action action = () =>
@@ -111,26 +188,10 @@ namespace Irc4TestForm
                     dt.SetLog(e.log);
                     if(server == current)
                     {
-                        ircDataGridView1.FirstDisplayedScrollingRowIndex = ircDataGridView1.Rows.Count - 1;
+                        if(ircDataGridView1.Rows.Count > 0)
+                            ircDataGridView1.FirstDisplayedScrollingRowIndex = ircDataGridView1.Rows.Count - 1;
                     }                        
                 }
-            };
-            if (InvokeRequired)
-                Invoke(action);
-            else
-                action();
-        }
-        void server_ReceiveEvent(object sender, Irc4.IRCReceiveEventArgs e)
-        {
-            Action action = () =>
-            {
-                if(e.serverChannel == current)
-                {
-
-                }
-                this.textBox1.Text += e.log.Text + Environment.NewLine;
-                this.textBox1.SelectionStart = this.textBox1.TextLength - 1;
-                this.textBox1.ScrollToCaret();
             };
             if (InvokeRequired)
                 Invoke(action);
@@ -157,17 +218,40 @@ namespace Irc4TestForm
         /// <param name="e"></param>
         private async void button2_Click(object sender, EventArgs e)
         {
-            await server.SendCmd(this.textBox2.Text);
+            if (current != null)
+            {
+                await current.SendCmd(this.textBox2.Text);
+                textBox2.Text = "";
+            }
         }
 
-        private async void button3_Click(object sender, EventArgs e)
+        private async void btnDisconnect_Click(object sender, EventArgs e)
         {
-            await server.Disconnect();
+            if (current != null)
+            {
+                await current.Disconnect();
+            }
+            
         }
 
         private void btnUpdateHost_Click(object sender, EventArgs e)
         {
-            server.Hostname = txtHost.Text;
+            if (current != null)
+            {
+                var serverInfo = CreateServerInfo(txtDisplayName.Text, txtHost.Text, txtNickname.Text);
+                current.SetInfo(serverInfo);
+                for(int i = 0; i < comboBox1.Items.Count ; i++)
+                {
+                    var item = comboBox1.Items[i];
+                    if (item != null && item is Irc4.Server && (Irc4.Server)item == current)
+                    {
+                        //上手く動くか自信ない。
+                        comboBox1.Items.Remove(item);
+                        var newIndex = comboBox1.Items.Add(item);
+                        comboBox1.SelectedIndex = newIndex;//今変更したアイテムが選択される。
+                    }
+                }
+            }
         }
         /// <summary>
         /// 
@@ -176,18 +260,23 @@ namespace Irc4TestForm
         /// <param name="e"></param>
         private void btnAddServer_Click(object sender, EventArgs e)
         {
+            var serverInfo = CreateServerInfo(txtDisplayName.Text, txtHost.Text, txtNickname.Text);
+            var server = ircManager.AddServer(serverInfo);
+            AddServer(server);
+        }
+        private Irc4.ServerInfo CreateServerInfo(string displayName, string hostname, string nickname)
+        {
             var serverInfo = new Irc4.ServerInfo();
-            serverInfo.DisplayName = txtDisplayName.Text;
-            serverInfo.Nickname = txtNickname.Text;
-            serverInfo.Hostname = txtHost.Text;
+            serverInfo.DisplayName = displayName;
+            serverInfo.Nickname = nickname;
+            serverInfo.Hostname = hostname;
             //面倒だから以下固定値。
             serverInfo.Port = 6667;
             serverInfo.CodePage = Encoding.UTF8.CodePage;
             serverInfo.Realname = "Irc Test";
-            serverInfo.Username = txtNickname.Text;
+            serverInfo.Username = nickname;
             serverInfo.Password = "";
-            var server = ircManager.AddServer(serverInfo);
-            AddServer(server);
+            return serverInfo;
         }
         /// <summary>
         /// 

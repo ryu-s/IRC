@@ -11,15 +11,37 @@ namespace Irc4
         string settingFilePath = System.Environment.CurrentDirectory + @"\Server.config";
         List<Server> serverList = new List<Server>();
 
+
+        /// <summary>
+        /// 接続に成功した。
+        /// </summary>
+        public event IrcEventHandler ConnectSuccess;
+        /// <summary>
+        /// 
+        /// </summary>
+        public event IrcEventHandler Disconnected;
         /// <summary>
         /// 何か受け取った。
         /// </summary>
         public event ReceiveEventHandler ReceiveEvent;
-
+        /// <summary>
+        /// 例外情報
+        /// </summary>
+        public event IrcExceptionHandler ExceptionInfo;
+        /// <summary>
+        /// 諸々の情報。例外はExceptionInfo。
+        /// </summary>
+        public event IrcInfoHandler InfoEvent;
+        /// <summary>
+        /// 
+        /// </summary>
         public IrcManager()
         {
             Load();
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public async void Save()
         {
             //切断しないと変更後の設定値を取得できない。
@@ -36,6 +58,9 @@ namespace Irc4
             
             ServerSettings.SaveToXmlFile(settingFilePath);
         }
+        /// <summary>
+        /// 
+        /// </summary>
         public void Load()
         {
             ServerSettings.LoadFromXmlFile(settingFilePath);
@@ -44,6 +69,11 @@ namespace Irc4
                 this.AddServer(serverInfo);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public Server AddServer(ServerInfo info)
         {
             //同じDisplayNameがあったらダメ
@@ -53,11 +83,51 @@ namespace Irc4
                     return null;
             }
             var newServer = new Server();
+            newServer.ConnectSuccess += newServer_ConnectSuccess;
+            newServer.Disconnected += newServer_Disconnected;
             newServer.ReceiveEvent += newServer_ReceiveEvent;
+            newServer.InfoEvent += newServer_InfoEvent;
+            newServer.ExceptionInfo += newServer_ExceptionInfo;
             newServer.SetInfo(info);
             serverList.Add(newServer);
 
             return newServer;
+        }
+
+        void newServer_Disconnected(object sender, IrcEventArgs e)
+        {
+            if (Disconnected != null)
+            {
+                Disconnected(sender, e);
+            }
+        }
+
+        void newServer_ExceptionInfo(object sender, IrcExceptionEventArgs e)
+        {
+            if (ExceptionInfo != null)
+            {
+                ExceptionInfo(sender, e);
+            }
+        }
+
+        void newServer_InfoEvent(object sender, IrcInfoEventArgs e)
+        {
+            if (InfoEvent != null)
+            {
+                InfoEvent(sender, e);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void newServer_ConnectSuccess(object sender, IrcEventArgs e)
+        {
+            if (ConnectSuccess != null)
+            {
+                ConnectSuccess(sender, e);
+            }
         }
         /// <summary>
         /// 

@@ -24,11 +24,23 @@ namespace Irc4
         /// <summary>
         /// 接続に成功した。
         /// </summary>
-        public event EventHandler ConnectSuccess;
+        public event IrcEventHandler ConnectSuccess;
+        /// <summary>
+        /// 
+        /// </summary>
+        public event IrcEventHandler Disconnected;
         /// <summary>
         /// 何か受け取った。
         /// </summary>
         public event ReceiveEventHandler ReceiveEvent;
+        /// <summary>
+        /// 例外情報
+        /// </summary>
+        public event IrcExceptionHandler ExceptionInfo;
+        /// <summary>
+        /// 諸々の情報。例外はExceptionInfo。
+        /// </summary>
+        public event IrcInfoHandler InfoEvent;
         /// <summary>
         /// 行末文字。
         /// </summary>
@@ -49,30 +61,22 @@ namespace Irc4
         /// <param name="info"></param>
         public void SetInfo(ServerInfo info)
         {
-            CopyInfo(info, infoModified);
+            infoModified.Clone(info);
             if (!IsConnected)
-                CopyInfo(info, this);
+                this.Clone(info);
+
+            var message = "設定変更完了。";
+            if (IsConnected)
+                message += "次回接続時に反映されます。";
+            InfoHandler(MyLibrary.LogLevel.notice, message);
         }
         public ServerInfo GetInfo()
         {
             var info = new ServerInfo();
-            CopyInfo(infoModified, info);
+            info.Clone(infoModified);
             return info;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="dst"></param>
-        public void CopyInfo(ServerInfo src, ServerInfo dst)
-        {
-            dst.DisplayName = src.DisplayName;
-            dst.Hostname = src.Hostname;
-            dst.Port = src.Port;
-            dst.Nickname = src.Nickname;
-            dst.Username = src.Username;
-            dst.Realname = src.Realname;
-        }
+
         /// <summary>
         /// 表示名
         /// </summary>
@@ -178,27 +182,23 @@ namespace Irc4
             }
 
         }
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public delegate void IrcExceptionHandler(object sender, IrcExceptionEventArgs e);
-        /// <summary>
-        /// 例外情報
-        /// </summary>
-        public event IrcExceptionHandler ExceptionInfo;
-
-        public delegate void IrcInfoHandler(object sender, IrcInfoHandler e);
-        /// <summary>
-        /// 諸々の情報。例外はExceptionInfo。
-        /// </summary>
-        public event IrcInfoHandler InfoEvent;
-
-
+        /// <param name="level"></param>
+        /// <param name="message"></param>
         private void InfoHandler(MyLibrary.LogLevel level, string message)
         {
-
+            if (InfoEvent != null)
+            {
+                var args = new IrcInfoEventArgs();
+                args.serverChannel = this;
+                args.Message = message;
+                args.logLevel = level;
+                args.date = DateTime.Now;
+                InfoEvent(this, args);
+            }
         }
 
         /// <summary>
@@ -208,8 +208,7 @@ namespace Irc4
         {
             var fatalErrorOccured = false;
             //Update my info
-            CopyInfo(infoModified, this);
-
+            this.Clone(infoModified);
             //存在しないホスト名だった場合に例外を投げるが、接続試行中にホスト名を変更すると、catch内で間違っている方のホスト名が参照できない。
             //そこで、一旦コピーしておく。
             var hostname = this.Hostname;
@@ -256,7 +255,11 @@ namespace Irc4
                 return;
             if (ConnectSuccess != null)
             {
-                ConnectSuccess(this, EventArgs.Empty);
+                var args = new IrcEventArgs();
+                args.date = DateTime.Now;
+                args.logLevel = MyLibrary.LogLevel.notice;
+                args.serverChannel = this;
+                ConnectSuccess(this, args);
             }
             var buffer = new byte[2048];
             var hostEnc = Encoding.UTF8;
@@ -325,6 +328,19 @@ namespace Irc4
                 InfoHandler(MyLibrary.LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
+            finally
+            {
+                if (Disconnected != null)
+                {
+                    System.Diagnostics.Debug.Assert(!IsConnected);
+
+                    var args = new IrcEventArgs();
+                    args.date = DateTime.Now;
+                    args.logLevel = MyLibrary.LogLevel.notice;
+                    args.serverChannel = this;
+                    Disconnected(this, args);
+                }
+            }
             if (!fatalErrorOccured)
                 Console.WriteLine("正常終了");
         }
@@ -333,7 +349,6 @@ namespace Irc4
             var log = new Irc4.Log(this, e.AddedString);
             if (ReceiveEvent != null)
             {
-
                 var args = new IRCReceiveEventArgs();
                 args.text = e.AddedString;
                 args.log = log;
@@ -464,6 +479,32 @@ namespace Irc4
         public string Username { get; set; }
         public string Realname { get; set; }
         public List<Channel> ChannelList { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public ServerInfo Clone()
+        {
+            var work = new ServerInfo();
+            work.Clone(this);
+            return work;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="src"></param>
+        public void Clone(ServerInfo src)
+        {
+            this.DisplayName = src.DisplayName;
+            this.Hostname = src.Hostname;
+            this.Port = src.Port;
+            this.CodePage = src.CodePage;
+            this.Password = src.Password;
+            this.Nickname = src.Nickname;
+            this.Username = src.Username;
+            this.Realname = src.Realname;
+            this.ChannelList = src.ChannelList;
+        }
     }
     [Serializable]
     public class ChannelInfo : IInfo
@@ -524,8 +565,28 @@ namespace Irc4
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
+    public delegate void IrcEventHandler(object sender, IrcEventArgs e);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public delegate void ReceiveEventHandler(object sender, IRCReceiveEventArgs e);
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    public delegate void IrcExceptionHandler(object sender, IrcExceptionEventArgs e);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    public delegate void IrcInfoHandler(object sender, IrcInfoEventArgs e);
+    /// <summary>
+    /// 
+    /// </summary>
     public class Parser
     {
 

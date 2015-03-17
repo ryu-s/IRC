@@ -12,7 +12,17 @@ namespace Irc4Control
         
         public IrcDataGridView()
         {
+            //ダブルバッファ
+            this.SetStyle(ControlStyles.ResizeRedraw, true);
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
 
+           //this.AutoGenerateColumns = false;
+            this.AllowUserToAddRows = false;
+            this.AllowUserToDeleteRows = false;
+            this.AllowUserToOrderColumns = false;
+            this.AllowUserToResizeRows = false;
+            this.RowHeadersVisible = false;
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
