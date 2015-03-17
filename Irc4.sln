@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irc4TestForm", "TestForm\Ir
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyLibrary", "..\MyLibrary\MyLibrary\MyLibrary.csproj", "{06091530-3C57-4179-B9E3-860872CDD38B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Irc4Control", "Irc4Control\Irc4Control.csproj", "{1FF80769-201D-4C0A-AEA2-1B518C4118DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,12 @@ Global
 		{06091530-3C57-4179-B9E3-860872CDD38B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06091530-3C57-4179-B9E3-860872CDD38B}.Release|x64.ActiveCfg = Release|x64
 		{06091530-3C57-4179-B9E3-860872CDD38B}.Release|x64.Build.0 = Release|x64
+		{1FF80769-201D-4C0A-AEA2-1B518C4118DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FF80769-201D-4C0A-AEA2-1B518C4118DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FF80769-201D-4C0A-AEA2-1B518C4118DE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1FF80769-201D-4C0A-AEA2-1B518C4118DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FF80769-201D-4C0A-AEA2-1B518C4118DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FF80769-201D-4C0A-AEA2-1B518C4118DE}.Release|x64.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

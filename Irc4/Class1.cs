@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
+
 namespace Irc4
 {
     [Serializable]
@@ -49,6 +50,8 @@ namespace Irc4
         public void SetInfo(ServerInfo info)
         {
             CopyInfo(info, infoModified);
+            if (!IsConnected)
+                CopyInfo(info, this);
         }
         public ServerInfo GetInfo()
         {
@@ -85,6 +88,8 @@ namespace Irc4
             set
             {
                 infoModified.DisplayName = value;
+                if (!IsConnected)
+                    base.DisplayName = value;
             }
         }
         /// <summary>
@@ -102,6 +107,26 @@ namespace Irc4
             set
             {
                 infoModified.Hostname = value;
+                if (!IsConnected)
+                    base.Hostname = value;
+            }
+        }        /// <summary>
+        /// 
+        /// </summary>
+        public new string Username
+        {
+            get
+            {
+                if (this.IsConnected)
+                    return base.Username;
+                else
+                    return infoModified.Username;
+            }
+            set
+            {
+                infoModified.Username = value;
+                if (!IsConnected)
+                    base.Username = value;
             }
         }
         /// <summary>
@@ -120,7 +145,7 @@ namespace Irc4
         /// <param name="level"></param>
         /// <param name="message"></param>
         /// <param name="ex"></param>
-        private void ExceptionHandler(MyLibrary.LogLevel level, string message, Exception ex)
+        private void InfoHandler(MyLibrary.LogLevel level, string message, Exception ex)
         {
             var additional = "";
             var logPath = @"C:\Irc4Exception.txt";
@@ -141,6 +166,39 @@ namespace Irc4
             {
                 sr.Write(s);
             }
+            if (ExceptionInfo != null)
+            {
+                var args = new IrcExceptionEventArgs();
+                args.date = DateTime.Now;
+                args.ex = ex;
+                args.logLevel = level;
+                args.serverChannel = this;
+                args.Message = message;
+                ExceptionInfo(this, args);
+            }
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public delegate void IrcExceptionHandler(object sender, IrcExceptionEventArgs e);
+        /// <summary>
+        /// 例外情報
+        /// </summary>
+        public event IrcExceptionHandler ExceptionInfo;
+
+        public delegate void IrcInfoHandler(object sender, IrcInfoHandler e);
+        /// <summary>
+        /// 諸々の情報。例外はExceptionInfo。
+        /// </summary>
+        public event IrcInfoHandler InfoEvent;
+
+
+        private void InfoHandler(MyLibrary.LogLevel level, string message)
+        {
+
         }
 
         /// <summary>
@@ -151,9 +209,13 @@ namespace Irc4
             var fatalErrorOccured = false;
             //Update my info
             CopyInfo(infoModified, this);
+
+            //存在しないホスト名だった場合に例外を投げるが、接続試行中にホスト名を変更すると、catch内で間違っている方のホスト名が参照できない。
+            //そこで、一旦コピーしておく。
+            var hostname = this.Hostname;
             try
             {
-                await socket.ConnectAsync(this.Hostname, this.Port);
+                await socket.ConnectAsync(hostname, this.Port);
             }
             catch (SocketException ex)
             {
@@ -161,13 +223,13 @@ namespace Irc4
                 switch (ex.SocketErrorCode)
                 {
                     case SocketError.HostNotFound:
-                        message = "No such host is known：" + this.Hostname;
+                        message = "No such host is known：" + hostname;
                         break;
                     case SocketError.ConnectionRefused:
                         message = "接続が拒否された。サーバソフトが起動してないか、正常に機能してない。";
                         break;
                     case SocketError.TimedOut:
-                        message = "Time out. Portが間違っているかも？";
+                        message = "Time out. Portが間違っているかも？ Port：" + this.Port;
                         break;
                     case SocketError.IsConnected:
                         message = "このソケットは接続済み。";
@@ -176,13 +238,13 @@ namespace Irc4
                         message = "Not Implemented";
                         break;
                 }
-                ExceptionHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(MyLibrary.LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
             catch (Exception ex)
             {
                 var message = "Not Implemented";
-                ExceptionHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(MyLibrary.LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
             if (fatalErrorOccured)
@@ -224,13 +286,13 @@ namespace Irc4
                             message = "Not Implemented SocketErrorCode:" + ex.SocketErrorCode.ToString();
                             break;
                     }
-                    ExceptionHandler(MyLibrary.LogLevel.error, message, ex);
+                    InfoHandler(MyLibrary.LogLevel.error, message, ex);
                     fatalErrorOccured = true;
                 }
                 catch (Exception ex)
                 {
                     var message = "Not Implemented";
-                    ExceptionHandler(MyLibrary.LogLevel.error, message, ex);
+                    InfoHandler(MyLibrary.LogLevel.error, message, ex);
                     fatalErrorOccured = true;
                 }
                 if (fatalErrorOccured)
@@ -254,13 +316,13 @@ namespace Irc4
                         message = "Not Implemented";
                         break;
                 }
-                ExceptionHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(MyLibrary.LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
             catch (Exception ex)
             {
                 var message = "Not Implemented";
-                ExceptionHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(MyLibrary.LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
             if (!fatalErrorOccured)
@@ -275,6 +337,7 @@ namespace Irc4
                 var args = new IRCReceiveEventArgs();
                 args.text = e.AddedString;
                 args.log = log;
+                args.serverChannel = this;
                 ReceiveEvent(this, args);
             }
             if (log.Command == Command.PING)
@@ -307,7 +370,7 @@ namespace Irc4
                         message = "Not Implemented";
                         break;
                 }
-                ExceptionHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(MyLibrary.LogLevel.error, message, ex);
             }
             return b;
         }
@@ -341,8 +404,16 @@ namespace Irc4
                         message = "Not Implemented";
                         break;
                 }
-                ExceptionHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(MyLibrary.LogLevel.error, message, ex);
             }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return this.DisplayName;
         }
     }
     [Serializable]
@@ -428,11 +499,25 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
-        //        public IServerChannel serverChannel;
+        public IInfo serverChannel;
         /// <summary>
         /// 
         /// </summary>
         public MyLibrary.LogLevel logLevel;
+    }
+    public class IrcInfoEventArgs : IrcEventArgs
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Message;
+    }
+    public class IrcExceptionEventArgs : IrcInfoEventArgs
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public Exception ex;
     }
     /// <summary>
     /// 

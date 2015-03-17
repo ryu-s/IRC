@@ -33,45 +33,57 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.btnDisconnect = new System.Windows.Forms.Button();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.txtHost = new System.Windows.Forms.TextBox();
+            this.txtNickname = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnUpdateHost = new System.Windows.Forms.Button();
+            this.ircDataGridView1 = new Irc4Control.IrcDataGridView();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.btnAddServer = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtDisplayName = new System.Windows.Forms.TextBox();
+            this.btnCreateNewServer = new System.Windows.Forms.Button();
+            this.btnCancelCreateNewServer = new System.Windows.Forms.Button();
+            this.label4 = new System.Windows.Forms.Label();
+            ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // btnConnect
             // 
-            this.btnConnect.Location = new System.Drawing.Point(393, 12);
+            this.btnConnect.Location = new System.Drawing.Point(511, 41);
             this.btnConnect.Name = "btnConnect";
             this.btnConnect.Size = new System.Drawing.Size(75, 23);
             this.btnConnect.TabIndex = 0;
             this.btnConnect.Text = "Connect";
             this.btnConnect.UseVisualStyleBackColor = true;
-            this.btnConnect.Click += new System.EventHandler(this.button1_Click);
+            this.btnConnect.Click += new System.EventHandler(this.btnConnect_Click);
             // 
             // textBox1
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(12, 128);
+            this.textBox1.Location = new System.Drawing.Point(12, 488);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(543, 259);
+            this.textBox1.Size = new System.Drawing.Size(749, 64);
             this.textBox1.TabIndex = 1;
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(12, 419);
+            this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox2.Location = new System.Drawing.Point(12, 584);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(456, 20);
+            this.textBox2.Size = new System.Drawing.Size(668, 20);
             this.textBox2.TabIndex = 2;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(480, 419);
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button2.Location = new System.Drawing.Point(686, 584);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 3;
@@ -81,7 +93,7 @@
             // 
             // btnDisconnect
             // 
-            this.btnDisconnect.Location = new System.Drawing.Point(393, 41);
+            this.btnDisconnect.Location = new System.Drawing.Point(592, 41);
             this.btnDisconnect.Name = "btnDisconnect";
             this.btnDisconnect.Size = new System.Drawing.Size(75, 23);
             this.btnDisconnect.TabIndex = 4;
@@ -89,24 +101,24 @@
             this.btnDisconnect.UseVisualStyleBackColor = true;
             this.btnDisconnect.Click += new System.EventHandler(this.button3_Click);
             // 
-            // textBox3
+            // txtHost
             // 
-            this.textBox3.Location = new System.Drawing.Point(104, 12);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(211, 20);
-            this.textBox3.TabIndex = 5;
+            this.txtHost.Location = new System.Drawing.Point(89, 38);
+            this.txtHost.Name = "txtHost";
+            this.txtHost.Size = new System.Drawing.Size(211, 20);
+            this.txtHost.TabIndex = 5;
             // 
-            // textBox4
+            // txtNickname
             // 
-            this.textBox4.Location = new System.Drawing.Point(104, 38);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(211, 20);
-            this.textBox4.TabIndex = 6;
+            this.txtNickname.Location = new System.Drawing.Point(89, 64);
+            this.txtNickname.Name = "txtNickname";
+            this.txtNickname.Size = new System.Drawing.Size(211, 20);
+            this.txtNickname.TabIndex = 6;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(32, 41);
+            this.label1.Location = new System.Drawing.Point(12, 71);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(55, 13);
             this.label1.TabIndex = 8;
@@ -115,7 +127,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(32, 15);
+            this.label2.Location = new System.Drawing.Point(12, 41);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 9;
@@ -123,24 +135,106 @@
             // 
             // btnUpdateHost
             // 
-            this.btnUpdateHost.Location = new System.Drawing.Point(393, 71);
+            this.btnUpdateHost.Location = new System.Drawing.Point(673, 41);
             this.btnUpdateHost.Name = "btnUpdateHost";
-            this.btnUpdateHost.Size = new System.Drawing.Size(75, 23);
+            this.btnUpdateHost.Size = new System.Drawing.Size(88, 23);
             this.btnUpdateHost.TabIndex = 10;
-            this.btnUpdateHost.Text = "UpdateHost";
+            this.btnUpdateHost.Text = "UpdateSetting";
             this.btnUpdateHost.UseVisualStyleBackColor = true;
             this.btnUpdateHost.Click += new System.EventHandler(this.btnUpdateHost_Click);
+            // 
+            // ircDataGridView1
+            // 
+            this.ircDataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ircDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ircDataGridView1.Location = new System.Drawing.Point(12, 99);
+            this.ircDataGridView1.Name = "ircDataGridView1";
+            this.ircDataGridView1.Size = new System.Drawing.Size(749, 383);
+            this.ircDataGridView1.TabIndex = 11;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(592, 14);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(169, 21);
+            this.comboBox1.TabIndex = 12;
+            // 
+            // btnAddServer
+            // 
+            this.btnAddServer.Location = new System.Drawing.Point(343, 41);
+            this.btnAddServer.Name = "btnAddServer";
+            this.btnAddServer.Size = new System.Drawing.Size(75, 23);
+            this.btnAddServer.TabIndex = 13;
+            this.btnAddServer.Text = "AddServer";
+            this.btnAddServer.UseVisualStyleBackColor = true;
+            this.btnAddServer.Click += new System.EventHandler(this.btnAddServer_Click);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 15);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(69, 13);
+            this.label3.TabIndex = 14;
+            this.label3.Text = "DisplayName";
+            // 
+            // txtDisplayName
+            // 
+            this.txtDisplayName.Location = new System.Drawing.Point(89, 12);
+            this.txtDisplayName.Name = "txtDisplayName";
+            this.txtDisplayName.Size = new System.Drawing.Size(211, 20);
+            this.txtDisplayName.TabIndex = 15;
+            // 
+            // btnCreateNewServer
+            // 
+            this.btnCreateNewServer.Location = new System.Drawing.Point(343, 12);
+            this.btnCreateNewServer.Name = "btnCreateNewServer";
+            this.btnCreateNewServer.Size = new System.Drawing.Size(104, 23);
+            this.btnCreateNewServer.TabIndex = 16;
+            this.btnCreateNewServer.Text = "CreateNewServer";
+            this.btnCreateNewServer.UseVisualStyleBackColor = true;
+            this.btnCreateNewServer.Click += new System.EventHandler(this.btnCreateNewServer_Click);
+            // 
+            // btnCancelCreateNewServer
+            // 
+            this.btnCancelCreateNewServer.Location = new System.Drawing.Point(343, 70);
+            this.btnCancelCreateNewServer.Name = "btnCancelCreateNewServer";
+            this.btnCancelCreateNewServer.Size = new System.Drawing.Size(75, 23);
+            this.btnCancelCreateNewServer.TabIndex = 17;
+            this.btnCancelCreateNewServer.Text = "Cancel";
+            this.btnCancelCreateNewServer.UseVisualStyleBackColor = true;
+            this.btnCancelCreateNewServer.Click += new System.EventHandler(this.btnCancelCreateNewServer_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(508, 17);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(75, 13);
+            this.label4.TabIndex = 18;
+            this.label4.Text = "Current Server";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(567, 451);
+            this.ClientSize = new System.Drawing.Size(773, 616);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.btnCancelCreateNewServer);
+            this.Controls.Add(this.btnCreateNewServer);
+            this.Controls.Add(this.txtDisplayName);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.btnAddServer);
+            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.ircDataGridView1);
             this.Controls.Add(this.btnUpdateHost);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox4);
-            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.txtNickname);
+            this.Controls.Add(this.txtHost);
             this.Controls.Add(this.btnDisconnect);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.textBox2);
@@ -148,6 +242,7 @@
             this.Controls.Add(this.btnConnect);
             this.Name = "Form1";
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -160,11 +255,19 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button btnDisconnect;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.TextBox txtHost;
+        private System.Windows.Forms.TextBox txtNickname;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnUpdateHost;
+        private Irc4Control.IrcDataGridView ircDataGridView1;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button btnAddServer;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtDisplayName;
+        private System.Windows.Forms.Button btnCreateNewServer;
+        private System.Windows.Forms.Button btnCancelCreateNewServer;
+        private System.Windows.Forms.Label label4;
     }
 }
 

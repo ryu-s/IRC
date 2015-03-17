@@ -10,6 +10,12 @@ namespace Irc4
     {
         string settingFilePath = System.Environment.CurrentDirectory + @"\Server.config";
         List<Server> serverList = new List<Server>();
+
+        /// <summary>
+        /// 何か受け取った。
+        /// </summary>
+        public event ReceiveEventHandler ReceiveEvent;
+
         public IrcManager()
         {
             Load();
@@ -33,20 +39,45 @@ namespace Irc4
         public void Load()
         {
             ServerSettings.LoadFromXmlFile(settingFilePath);
+            foreach (var serverInfo in ServerSettings.Instance.ServerInfoList)
+            {
+                this.AddServer(serverInfo);
+            }
         }
-        public bool AddServer(ServerInfo info)
+        public Server AddServer(ServerInfo info)
         {
-            //同じDisplayName
-            foreach (var server in ServerSettings.Instance.ServerInfoList)
+            //同じDisplayNameがあったらダメ
+            foreach (var server in serverList)
             {
                 if (server.DisplayName == info.DisplayName)
-                    return false;
+                    return null;
             }
             var newServer = new Server();
+            newServer.ReceiveEvent += newServer_ReceiveEvent;
             newServer.SetInfo(info);
             serverList.Add(newServer);
 
-            return true;
+            return newServer;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void newServer_ReceiveEvent(object sender, IRCReceiveEventArgs e)
+        {
+            if (ReceiveEvent != null)
+            {
+                ReceiveEvent(sender, e);
+            }
+        }
+
+        public List<Server> ServerList
+        {
+            get
+            {
+                return serverList;
+            }
         }
     }
 }

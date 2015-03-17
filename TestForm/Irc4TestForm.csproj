@@ -78,6 +78,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Irc4Control\Irc4Control.csproj">
+      <Project>{1FF80769-201D-4C0A-AEA2-1B518C4118DE}</Project>
+      <Name>Irc4Control</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Irc4\Irc4.csproj">
       <Project>{993caf01-afb1-48e9-ac6d-c50a412e53f2}</Project>
       <Name>Irc4</Name>
