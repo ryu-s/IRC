@@ -43,11 +43,6 @@ namespace Irc4Control
             this.Columns[column4Name].DataPropertyName = column4Name;
             this.Columns[column4Name].Width = 400;
         }
-        protected override void OnDataSourceChanged(EventArgs e)
-        {
-            
-            base.OnDataSourceChanged(e);
-        }
         /// <summary>
         /// 
         /// </summary>
@@ -65,9 +60,30 @@ namespace Irc4Control
 
                     //右クリックした行のLogを取得する。
                     var myDt = (MyDataTable)dt;
-                    var log = myDt.GetLog(hitTestInfo.RowIndex);
+                    if (hitTestInfo.RowIndex >= 0)
+                    {
+                        var log = myDt.GetLog(hitTestInfo.RowIndex);
+
+                        var itemNickname = new ToolStripMenuItem();
+                        itemNickname.Text = log.SenderInfo.NickName;
+                        itemNickname.Enabled = false;
+
+                        var itemText = new ToolStripMenuItem();
+                        itemText.Text = "Copy Text";
+                        itemText.MouseUp += (sender, arg) =>
+                        {
+                            Clipboard.SetText(log.Text);
+                        };
+
+                        contextMenuStrip1.Items.Clear();
+                        contextMenuStrip1.Items.Add(itemNickname);
+                        contextMenuStrip1.Items.Add("-");
+                        contextMenuStrip1.Items.Add(itemText);
+                        contextMenuStrip1.Show(this,e.X, e.Y);
+                    }
                 }
             }
         }
+        private ContextMenuStrip contextMenuStrip1 = new ContextMenuStrip();
     }
 }

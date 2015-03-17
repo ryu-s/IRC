@@ -99,7 +99,7 @@ namespace Irc4TestForm
         {
             Action action = () =>
             {
-                this.textBox1.Text += string.Format("[{0}] {1}", e.serverChannel.DisplayName, e.Message) + Environment.NewLine;
+                this.textBox1.Text += string.Format("{0} [{1}] {2}",e.date.ToString("HH:mm:ss"), e.serverChannel.DisplayName, e.Message) + Environment.NewLine;
                 this.textBox1.SelectionStart = this.textBox1.TextLength - 1;
                 this.textBox1.ScrollToCaret();
 
