@@ -260,9 +260,13 @@ namespace Irc4TestForm
         /// <param name="e"></param>
         private void btnAddServer_Click(object sender, EventArgs e)
         {
-            var serverInfo = CreateServerInfo(txtDisplayName.Text, txtHost.Text, txtNickname.Text);
+            var displayName = txtDisplayName.Text;
+            var host = txtHost.Text;
+            var nickname = txtNickname.Text;
+            var serverInfo = CreateServerInfo(displayName, host, nickname);
             var server = ircManager.AddServer(serverInfo);
-            AddServer(server);
+            if(server != null)
+                AddServer(server);
         }
         private Irc4.ServerInfo CreateServerInfo(string displayName, string hostname, string nickname)
         {

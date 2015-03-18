@@ -7,6 +7,13 @@ using System.Net.Sockets;
 
 namespace Irc4
 {
+    //[改善点]
+    //自分が打った文字列が反映されない。
+    //
+
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     public class Server : ServerInfo, ISec
     {
@@ -195,7 +202,6 @@ namespace Irc4
                 InfoEvent(this, args);
             }
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -347,13 +353,27 @@ namespace Irc4
             if (!fatalErrorOccured)
                 Console.WriteLine("正常終了");
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         async void splitBuffer_AddedEvent(object sender, MyLibrary.MySocket.AddedEventArgs e)
         {
             var log = new Irc4.Log(this, e.AddedString);
+            await SetLog(log);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="log"></param>
+        async Task SetLog(Log log)
+        {
+            //QUITとNICKを全チャンネルに渡す必要がある。チャンネルからそれを飛ばしたユーザを外すため。
             if (ReceiveEvent != null)
             {
                 var args = new IRCReceiveEventArgs();
-                args.text = e.AddedString;
+                args.text = log.Text;//TODO:要らない
                 args.log = log;
                 args.serverChannel = this;
                 ReceiveEvent(this, args);

@@ -39,6 +39,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.btnUpdateHost = new System.Windows.Forms.Button();
             this.ircDataGridView1 = new Irc4Control.IrcDataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.btnAddServer = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -46,7 +50,22 @@
             this.btnCreateNewServer = new System.Windows.Forms.Button();
             this.btnCancelCreateNewServer = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.ircDataGridView2 = new Irc4Control.IrcDataGridView();
+            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.txtChannelDisplayName = new System.Windows.Forms.TextBox();
+            this.btnJoin = new System.Windows.Forms.Button();
+            this.comboBoxCurrentChannel = new System.Windows.Forms.ComboBox();
+            this.btnPart = new System.Windows.Forms.Button();
+            this.btnCreateNewChannel = new System.Windows.Forms.Button();
+            this.btnAddChannel = new System.Windows.Forms.Button();
+            this.btnCancelCreateNewChannel = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
+            this.btnUpdateChannelSetting = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView2)).BeginInit();
             this.SuspendLayout();
             // 
             // btnConnect
@@ -61,29 +80,28 @@
             // 
             // textBox1
             // 
-            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(12, 488);
+            this.textBox1.Location = new System.Drawing.Point(12, 604);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox1.Size = new System.Drawing.Size(749, 64);
+            this.textBox1.Size = new System.Drawing.Size(859, 64);
             this.textBox1.TabIndex = 1;
             // 
             // textBox2
             // 
             this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(12, 584);
+            this.textBox2.Location = new System.Drawing.Point(12, 700);
             this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(668, 20);
+            this.textBox2.Size = new System.Drawing.Size(778, 20);
             this.textBox2.TabIndex = 2;
             // 
             // button2
             // 
             this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.Location = new System.Drawing.Point(686, 584);
+            this.button2.Location = new System.Drawing.Point(796, 700);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 3;
@@ -145,14 +163,47 @@
             // 
             // ircDataGridView1
             // 
-            this.ircDataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.ircDataGridView1.AllowUserToAddRows = false;
+            this.ircDataGridView1.AllowUserToDeleteRows = false;
+            this.ircDataGridView1.AllowUserToResizeRows = false;
+            this.ircDataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ircDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ircDataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2,
+            this.dataGridViewTextBoxColumn3,
+            this.dataGridViewTextBoxColumn4});
             this.ircDataGridView1.Location = new System.Drawing.Point(12, 99);
             this.ircDataGridView1.Name = "ircDataGridView1";
-            this.ircDataGridView1.Size = new System.Drawing.Size(749, 383);
+            this.ircDataGridView1.RowHeadersVisible = false;
+            this.ircDataGridView1.Size = new System.Drawing.Size(859, 177);
             this.ircDataGridView1.TabIndex = 11;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.DataPropertyName = "time";
+            this.dataGridViewTextBoxColumn1.HeaderText = "time";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.DataPropertyName = "sender";
+            this.dataGridViewTextBoxColumn2.HeaderText = "sender";
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.DataPropertyName = "command";
+            this.dataGridViewTextBoxColumn3.HeaderText = "command";
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            this.dataGridViewTextBoxColumn4.DataPropertyName = "text";
+            this.dataGridViewTextBoxColumn4.HeaderText = "text";
+            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            this.dataGridViewTextBoxColumn4.Width = 400;
             // 
             // comboBox1
             // 
@@ -217,11 +268,144 @@
             this.label4.TabIndex = 18;
             this.label4.Text = "Current Server";
             // 
+            // ircDataGridView2
+            // 
+            this.ircDataGridView2.AllowUserToAddRows = false;
+            this.ircDataGridView2.AllowUserToDeleteRows = false;
+            this.ircDataGridView2.AllowUserToResizeRows = false;
+            this.ircDataGridView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ircDataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ircDataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn5,
+            this.dataGridViewTextBoxColumn6,
+            this.dataGridViewTextBoxColumn7,
+            this.dataGridViewTextBoxColumn8});
+            this.ircDataGridView2.Location = new System.Drawing.Point(12, 308);
+            this.ircDataGridView2.Name = "ircDataGridView2";
+            this.ircDataGridView2.RowHeadersVisible = false;
+            this.ircDataGridView2.Size = new System.Drawing.Size(859, 290);
+            this.ircDataGridView2.TabIndex = 19;
+            // 
+            // dataGridViewTextBoxColumn5
+            // 
+            this.dataGridViewTextBoxColumn5.DataPropertyName = "time";
+            this.dataGridViewTextBoxColumn5.HeaderText = "time";
+            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
+            // 
+            // dataGridViewTextBoxColumn6
+            // 
+            this.dataGridViewTextBoxColumn6.DataPropertyName = "sender";
+            this.dataGridViewTextBoxColumn6.HeaderText = "sender";
+            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
+            // 
+            // dataGridViewTextBoxColumn7
+            // 
+            this.dataGridViewTextBoxColumn7.DataPropertyName = "command";
+            this.dataGridViewTextBoxColumn7.HeaderText = "command";
+            this.dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
+            // 
+            // dataGridViewTextBoxColumn8
+            // 
+            this.dataGridViewTextBoxColumn8.DataPropertyName = "text";
+            this.dataGridViewTextBoxColumn8.HeaderText = "text";
+            this.dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
+            this.dataGridViewTextBoxColumn8.Width = 400;
+            // 
+            // txtChannelDisplayName
+            // 
+            this.txtChannelDisplayName.Location = new System.Drawing.Point(64, 284);
+            this.txtChannelDisplayName.Name = "txtChannelDisplayName";
+            this.txtChannelDisplayName.Size = new System.Drawing.Size(130, 20);
+            this.txtChannelDisplayName.TabIndex = 20;
+            // 
+            // btnJoin
+            // 
+            this.btnJoin.Location = new System.Drawing.Point(654, 281);
+            this.btnJoin.Name = "btnJoin";
+            this.btnJoin.Size = new System.Drawing.Size(57, 23);
+            this.btnJoin.TabIndex = 21;
+            this.btnJoin.Text = "Join";
+            this.btnJoin.UseVisualStyleBackColor = true;
+            // 
+            // comboBoxCurrentChannel
+            // 
+            this.comboBoxCurrentChannel.FormattingEnabled = true;
+            this.comboBoxCurrentChannel.Location = new System.Drawing.Point(467, 283);
+            this.comboBoxCurrentChannel.Name = "comboBoxCurrentChannel";
+            this.comboBoxCurrentChannel.Size = new System.Drawing.Size(181, 21);
+            this.comboBoxCurrentChannel.TabIndex = 22;
+            // 
+            // btnPart
+            // 
+            this.btnPart.Location = new System.Drawing.Point(717, 281);
+            this.btnPart.Name = "btnPart";
+            this.btnPart.Size = new System.Drawing.Size(52, 23);
+            this.btnPart.TabIndex = 23;
+            this.btnPart.Text = "Part";
+            this.btnPart.UseVisualStyleBackColor = true;
+            // 
+            // btnCreateNewChannel
+            // 
+            this.btnCreateNewChannel.Location = new System.Drawing.Point(200, 282);
+            this.btnCreateNewChannel.Name = "btnCreateNewChannel";
+            this.btnCreateNewChannel.Size = new System.Drawing.Size(88, 23);
+            this.btnCreateNewChannel.TabIndex = 24;
+            this.btnCreateNewChannel.Text = "CreateChannel";
+            this.btnCreateNewChannel.UseVisualStyleBackColor = true;
+            // 
+            // btnAddChannel
+            // 
+            this.btnAddChannel.Location = new System.Drawing.Point(294, 282);
+            this.btnAddChannel.Name = "btnAddChannel";
+            this.btnAddChannel.Size = new System.Drawing.Size(75, 23);
+            this.btnAddChannel.TabIndex = 25;
+            this.btnAddChannel.Text = "AddChannel";
+            this.btnAddChannel.UseVisualStyleBackColor = true;
+            // 
+            // btnCancelCreateNewChannel
+            // 
+            this.btnCancelCreateNewChannel.Location = new System.Drawing.Point(375, 282);
+            this.btnCancelCreateNewChannel.Name = "btnCancelCreateNewChannel";
+            this.btnCancelCreateNewChannel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancelCreateNewChannel.TabIndex = 26;
+            this.btnCancelCreateNewChannel.Text = "Cancel";
+            this.btnCancelCreateNewChannel.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(12, 287);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(46, 13);
+            this.label5.TabIndex = 27;
+            this.label5.Text = "Channel";
+            // 
+            // btnUpdateChannelSetting
+            // 
+            this.btnUpdateChannelSetting.Location = new System.Drawing.Point(775, 281);
+            this.btnUpdateChannelSetting.Name = "btnUpdateChannelSetting";
+            this.btnUpdateChannelSetting.Size = new System.Drawing.Size(75, 23);
+            this.btnUpdateChannelSetting.TabIndex = 28;
+            this.btnUpdateChannelSetting.Text = "Update";
+            this.btnUpdateChannelSetting.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(773, 616);
+            this.ClientSize = new System.Drawing.Size(883, 732);
+            this.Controls.Add(this.btnUpdateChannelSetting);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.btnCancelCreateNewChannel);
+            this.Controls.Add(this.btnAddChannel);
+            this.Controls.Add(this.btnCreateNewChannel);
+            this.Controls.Add(this.btnPart);
+            this.Controls.Add(this.comboBoxCurrentChannel);
+            this.Controls.Add(this.btnJoin);
+            this.Controls.Add(this.txtChannelDisplayName);
+            this.Controls.Add(this.ircDataGridView2);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.btnCancelCreateNewServer);
             this.Controls.Add(this.btnCreateNewServer);
@@ -243,6 +427,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -268,6 +453,24 @@
         private System.Windows.Forms.Button btnCreateNewServer;
         private System.Windows.Forms.Button btnCancelCreateNewServer;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn4;
+        private Irc4Control.IrcDataGridView ircDataGridView2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn5;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn6;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn7;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn8;
+        private System.Windows.Forms.TextBox txtChannelDisplayName;
+        private System.Windows.Forms.Button btnJoin;
+        private System.Windows.Forms.ComboBox comboBoxCurrentChannel;
+        private System.Windows.Forms.Button btnPart;
+        private System.Windows.Forms.Button btnCreateNewChannel;
+        private System.Windows.Forms.Button btnAddChannel;
+        private System.Windows.Forms.Button btnCancelCreateNewChannel;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button btnUpdateChannelSetting;
     }
 }
 

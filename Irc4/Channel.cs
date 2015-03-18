@@ -21,6 +21,26 @@ namespace Irc4
             //TODO:
             await Task.Delay(100);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="log"></param>
+        public void QuitHandler(Log log)
+        {
+            if (log == null || log.Command != Command.QUIT)
+                throw new ArgumentException("log");
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="log"></param>
+        public void NickHandler(Log log)
+        {
+            if (log == null || log.Command != Command.NICK)
+                throw new ArgumentException("log");
+
+        }
         public void SetInfo(ChannelInfo info)
         {
 

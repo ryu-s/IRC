@@ -21,8 +21,8 @@ namespace Irc4Control
             this.SetStyle(ControlStyles.ResizeRedraw, true);
             this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-
-           this.AutoGenerateColumns = false;
+            
+            this.AutoGenerateColumns = false;
             this.AllowUserToAddRows = false;
             this.AllowUserToDeleteRows = false;
             this.AllowUserToOrderColumns = false;
