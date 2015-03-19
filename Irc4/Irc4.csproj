@@ -43,6 +43,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="ExceptionHandler.cs" />
     <Compile Include="IrcManager.cs" />
     <Compile Include="IrcTool.cs" />
     <Compile Include="Log.cs" />

@@ -65,22 +65,35 @@ namespace Irc4
         /// <param name="info"></param>
         public void SetInfo(ServerInfo info)
         {
+            //if (info.ChannelList == null)
+            //    info.ChannelList = new List<Channel>();
+
             infoModified.Clone(info);
             if (!IsConnected)
                 this.Clone(info);
 
+            //ここでChannnelListに登録する以外のAddChannel()と同様の処理をする。
+            //共通化できれば良いのだが。
+            foreach (var channel in info.ChannelList)
+            {
+                channel.Server = this;
+                OnAddChannel(channel);
+            }
             var message = "設定変更完了。";
             if (IsConnected)
                 message += "次回接続時に反映されます。";
             InfoHandler(MyLibrary.LogLevel.notice, message);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ServerInfo GetInfo()
         {
             var info = new ServerInfo();
             info.Clone(infoModified);
             return info;
         }
-
         /// <summary>
         /// 表示名
         /// </summary>
@@ -118,7 +131,8 @@ namespace Irc4
                 if (!IsConnected)
                     base.Hostname = value;
             }
-        }        /// <summary>
+        }
+        /// <summary>
         /// 
         /// </summary>
         public new string Username
@@ -135,6 +149,55 @@ namespace Irc4
                 infoModified.Username = value;
                 if (!IsConnected)
                     base.Username = value;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public new List<Channel> ChannelList
+        {
+            get
+            {
+                return base.ChannelList;
+            }
+            set
+            {
+                infoModified.ChannelList = value;
+                if(!IsConnected)
+                    base.ChannelList = value;
+            }
+        }
+        public Channel AddChannel(ChannelInfo channelInfo)
+        {
+            Channel newChannel = null;
+            try
+            {
+                newChannel = new Channel();
+                //TODO:
+                newChannel.Server = this;
+                newChannel.SetInfo(channelInfo);
+                ChannelList.Add(newChannel);
+                OnAddChannel(newChannel);
+            }
+            catch (Exception ex)
+            {
+                InfoHandler(MyLibrary.LogLevel.error, ex.Message, ex);
+            }
+            return newChannel;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="channel"></param>
+        void OnAddChannel(Channel channel)
+        {
+            //TODO:チャンネルが追加されたら発生するイベントを追加する。
+        }
+        void newChannel_ReceiveEvent(object sender, IRCReceiveEventArgs e)
+        {
+            if (ReceiveEvent != null)
+            {
+                ReceiveEvent(sender, e);
             }
         }
         /// <summary>
@@ -370,18 +433,81 @@ namespace Irc4
         async Task SetLog(Log log)
         {
             //QUITとNICKを全チャンネルに渡す必要がある。チャンネルからそれを飛ばしたユーザを外すため。
+
+
+            //チャンネル名に何か入っていた場合の準備
+            Channel channel = null;
+            if (!string.IsNullOrWhiteSpace(log.ChannelName))
+            {
+                channel = GetChannel(log.ChannelName);
+                if (channel == null)
+                {
+                    if (log.Command == Command.JOIN)
+                    {
+                        var newChannelInfo = new ChannelInfo();
+                        newChannelInfo.DisplayName = log.ChannelName;
+                        AddChannel(newChannelInfo);
+                    }
+                    //未登録のチャンネル。JOINだったら登録する処理か？どんなメッセージが来るかあんまり分からないから情報収集。
+                    using (var sw = new System.IO.StreamWriter(@"C:\notSubscribedChannelMessage.txt", true))
+                    {
+                        var s = ""
+                            + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") + Environment.NewLine
+                            + log.Command.ToString() + Environment.NewLine
+                            + log.Raw + Environment.NewLine
+                            + "==========================" + Environment.NewLine;
+                        sw.Write(s);
+                    }
+                }
+            }
+
+            //受信通知 TODO:位置はここで良いか？サーバやチャンネル固有の処理をした後の方が良いか？
             if (ReceiveEvent != null)
             {
                 var args = new IRCReceiveEventArgs();
                 args.text = log.Text;//TODO:要らない
                 args.log = log;
-                args.serverChannel = this;
+                args.serverChannel = (channel == null) ? (IInfo)this : channel;
                 ReceiveEvent(this, args);
             }
-            if (log.Command == Command.PING)
+
+            if(channel == null)
             {
-                await Pong(log.Sender);
+                //サーバ向けのメッセージ
+
+                if (log.Command == Command.PING)
+                {
+                    await Pong(log.Sender);
+                }
+                else if (log.Command == Command.QUIT)
+                {
+
+                }
+                else if (log.Command == Command.NICK)
+                {
+
+                }
             }
+            else
+            {
+                //チャンネル向けメッセージ
+
+                channel.SetLog(log);
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="displayName"></param>
+        /// <returns></returns>
+        public Channel GetChannel(string displayName)
+        {
+            foreach(var channel in this.infoModified.ChannelList)
+            {
+                if (channel.DisplayName.ToLower() == displayName.ToLower())
+                    return channel;
+            }
+            return null;
         }
         public async Task<bool> SendCmd(string str)
         {

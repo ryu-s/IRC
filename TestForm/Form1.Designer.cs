@@ -38,11 +38,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnUpdateHost = new System.Windows.Forms.Button();
-            this.ircDataGridView1 = new Irc4Control.IrcDataGridView();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.btnAddServer = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
@@ -50,11 +45,6 @@
             this.btnCreateNewServer = new System.Windows.Forms.Button();
             this.btnCancelCreateNewServer = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.ircDataGridView2 = new Irc4Control.IrcDataGridView();
-            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.txtChannelDisplayName = new System.Windows.Forms.TextBox();
             this.btnJoin = new System.Windows.Forms.Button();
             this.comboBoxCurrentChannel = new System.Windows.Forms.ComboBox();
@@ -64,8 +54,26 @@
             this.btnCancelCreateNewChannel = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
             this.btnUpdateChannelSetting = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView1)).BeginInit();
+            this.ircDataGridView2 = new Irc4Control.IrcDataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn16 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ircDataGridView1 = new Irc4Control.IrcDataGridView();
+            this.dataGridViewTextBoxColumn9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // btnConnect
@@ -161,50 +169,6 @@
             this.btnUpdateHost.UseVisualStyleBackColor = true;
             this.btnUpdateHost.Click += new System.EventHandler(this.btnUpdateHost_Click);
             // 
-            // ircDataGridView1
-            // 
-            this.ircDataGridView1.AllowUserToAddRows = false;
-            this.ircDataGridView1.AllowUserToDeleteRows = false;
-            this.ircDataGridView1.AllowUserToResizeRows = false;
-            this.ircDataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ircDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.ircDataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn1,
-            this.dataGridViewTextBoxColumn2,
-            this.dataGridViewTextBoxColumn3,
-            this.dataGridViewTextBoxColumn4});
-            this.ircDataGridView1.Location = new System.Drawing.Point(12, 99);
-            this.ircDataGridView1.Name = "ircDataGridView1";
-            this.ircDataGridView1.RowHeadersVisible = false;
-            this.ircDataGridView1.Size = new System.Drawing.Size(859, 177);
-            this.ircDataGridView1.TabIndex = 11;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.DataPropertyName = "time";
-            this.dataGridViewTextBoxColumn1.HeaderText = "time";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            this.dataGridViewTextBoxColumn2.DataPropertyName = "sender";
-            this.dataGridViewTextBoxColumn2.HeaderText = "sender";
-            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            this.dataGridViewTextBoxColumn3.DataPropertyName = "command";
-            this.dataGridViewTextBoxColumn3.HeaderText = "command";
-            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            // 
-            // dataGridViewTextBoxColumn4
-            // 
-            this.dataGridViewTextBoxColumn4.DataPropertyName = "text";
-            this.dataGridViewTextBoxColumn4.HeaderText = "text";
-            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-            this.dataGridViewTextBoxColumn4.Width = 400;
-            // 
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
@@ -268,51 +232,6 @@
             this.label4.TabIndex = 18;
             this.label4.Text = "Current Server";
             // 
-            // ircDataGridView2
-            // 
-            this.ircDataGridView2.AllowUserToAddRows = false;
-            this.ircDataGridView2.AllowUserToDeleteRows = false;
-            this.ircDataGridView2.AllowUserToResizeRows = false;
-            this.ircDataGridView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ircDataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.ircDataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn5,
-            this.dataGridViewTextBoxColumn6,
-            this.dataGridViewTextBoxColumn7,
-            this.dataGridViewTextBoxColumn8});
-            this.ircDataGridView2.Location = new System.Drawing.Point(12, 308);
-            this.ircDataGridView2.Name = "ircDataGridView2";
-            this.ircDataGridView2.RowHeadersVisible = false;
-            this.ircDataGridView2.Size = new System.Drawing.Size(859, 290);
-            this.ircDataGridView2.TabIndex = 19;
-            // 
-            // dataGridViewTextBoxColumn5
-            // 
-            this.dataGridViewTextBoxColumn5.DataPropertyName = "time";
-            this.dataGridViewTextBoxColumn5.HeaderText = "time";
-            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
-            // 
-            // dataGridViewTextBoxColumn6
-            // 
-            this.dataGridViewTextBoxColumn6.DataPropertyName = "sender";
-            this.dataGridViewTextBoxColumn6.HeaderText = "sender";
-            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
-            // 
-            // dataGridViewTextBoxColumn7
-            // 
-            this.dataGridViewTextBoxColumn7.DataPropertyName = "command";
-            this.dataGridViewTextBoxColumn7.HeaderText = "command";
-            this.dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
-            // 
-            // dataGridViewTextBoxColumn8
-            // 
-            this.dataGridViewTextBoxColumn8.DataPropertyName = "text";
-            this.dataGridViewTextBoxColumn8.HeaderText = "text";
-            this.dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
-            this.dataGridViewTextBoxColumn8.Width = 400;
-            // 
             // txtChannelDisplayName
             // 
             this.txtChannelDisplayName.Location = new System.Drawing.Point(64, 284);
@@ -328,6 +247,7 @@
             this.btnJoin.TabIndex = 21;
             this.btnJoin.Text = "Join";
             this.btnJoin.UseVisualStyleBackColor = true;
+            this.btnJoin.Click += new System.EventHandler(this.btnJoin_Click);
             // 
             // comboBoxCurrentChannel
             // 
@@ -336,6 +256,7 @@
             this.comboBoxCurrentChannel.Name = "comboBoxCurrentChannel";
             this.comboBoxCurrentChannel.Size = new System.Drawing.Size(181, 21);
             this.comboBoxCurrentChannel.TabIndex = 22;
+            this.comboBoxCurrentChannel.SelectedIndexChanged += new System.EventHandler(this.comboBoxCurrentChannel_SelectedIndexChanged);
             // 
             // btnPart
             // 
@@ -345,6 +266,7 @@
             this.btnPart.TabIndex = 23;
             this.btnPart.Text = "Part";
             this.btnPart.UseVisualStyleBackColor = true;
+            this.btnPart.Click += new System.EventHandler(this.btnPart_Click);
             // 
             // btnCreateNewChannel
             // 
@@ -391,6 +313,153 @@
             this.btnUpdateChannelSetting.Text = "Update";
             this.btnUpdateChannelSetting.UseVisualStyleBackColor = true;
             // 
+            // ircDataGridView2
+            // 
+            this.ircDataGridView2.AllowUserToAddRows = false;
+            this.ircDataGridView2.AllowUserToDeleteRows = false;
+            this.ircDataGridView2.AllowUserToResizeRows = false;
+            this.ircDataGridView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ircDataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ircDataGridView2.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn13,
+            this.dataGridViewTextBoxColumn14,
+            this.dataGridViewTextBoxColumn15,
+            this.dataGridViewTextBoxColumn16,
+            this.dataGridViewTextBoxColumn5,
+            this.dataGridViewTextBoxColumn6,
+            this.dataGridViewTextBoxColumn7,
+            this.dataGridViewTextBoxColumn8});
+            this.ircDataGridView2.Location = new System.Drawing.Point(12, 308);
+            this.ircDataGridView2.Name = "ircDataGridView2";
+            this.ircDataGridView2.RowHeadersVisible = false;
+            this.ircDataGridView2.Size = new System.Drawing.Size(859, 290);
+            this.ircDataGridView2.TabIndex = 19;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.DataPropertyName = "time";
+            this.dataGridViewTextBoxColumn1.HeaderText = "time";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.DataPropertyName = "sender";
+            this.dataGridViewTextBoxColumn2.HeaderText = "sender";
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.DataPropertyName = "command";
+            this.dataGridViewTextBoxColumn3.HeaderText = "command";
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            this.dataGridViewTextBoxColumn4.DataPropertyName = "text";
+            this.dataGridViewTextBoxColumn4.HeaderText = "text";
+            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            this.dataGridViewTextBoxColumn4.Width = 400;
+            // 
+            // dataGridViewTextBoxColumn13
+            // 
+            this.dataGridViewTextBoxColumn13.DataPropertyName = "time";
+            this.dataGridViewTextBoxColumn13.HeaderText = "time";
+            this.dataGridViewTextBoxColumn13.Name = "dataGridViewTextBoxColumn13";
+            // 
+            // dataGridViewTextBoxColumn14
+            // 
+            this.dataGridViewTextBoxColumn14.DataPropertyName = "sender";
+            this.dataGridViewTextBoxColumn14.HeaderText = "sender";
+            this.dataGridViewTextBoxColumn14.Name = "dataGridViewTextBoxColumn14";
+            // 
+            // dataGridViewTextBoxColumn15
+            // 
+            this.dataGridViewTextBoxColumn15.DataPropertyName = "command";
+            this.dataGridViewTextBoxColumn15.HeaderText = "command";
+            this.dataGridViewTextBoxColumn15.Name = "dataGridViewTextBoxColumn15";
+            // 
+            // dataGridViewTextBoxColumn16
+            // 
+            this.dataGridViewTextBoxColumn16.DataPropertyName = "text";
+            this.dataGridViewTextBoxColumn16.HeaderText = "text";
+            this.dataGridViewTextBoxColumn16.Name = "dataGridViewTextBoxColumn16";
+            this.dataGridViewTextBoxColumn16.Width = 400;
+            // 
+            // dataGridViewTextBoxColumn5
+            // 
+            this.dataGridViewTextBoxColumn5.DataPropertyName = "time";
+            this.dataGridViewTextBoxColumn5.HeaderText = "time";
+            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
+            // 
+            // dataGridViewTextBoxColumn6
+            // 
+            this.dataGridViewTextBoxColumn6.DataPropertyName = "sender";
+            this.dataGridViewTextBoxColumn6.HeaderText = "sender";
+            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
+            // 
+            // dataGridViewTextBoxColumn7
+            // 
+            this.dataGridViewTextBoxColumn7.DataPropertyName = "command";
+            this.dataGridViewTextBoxColumn7.HeaderText = "command";
+            this.dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
+            // 
+            // dataGridViewTextBoxColumn8
+            // 
+            this.dataGridViewTextBoxColumn8.DataPropertyName = "text";
+            this.dataGridViewTextBoxColumn8.HeaderText = "text";
+            this.dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
+            this.dataGridViewTextBoxColumn8.Width = 400;
+            // 
+            // ircDataGridView1
+            // 
+            this.ircDataGridView1.AllowUserToAddRows = false;
+            this.ircDataGridView1.AllowUserToDeleteRows = false;
+            this.ircDataGridView1.AllowUserToResizeRows = false;
+            this.ircDataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ircDataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ircDataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn9,
+            this.dataGridViewTextBoxColumn10,
+            this.dataGridViewTextBoxColumn11,
+            this.dataGridViewTextBoxColumn12,
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2,
+            this.dataGridViewTextBoxColumn3,
+            this.dataGridViewTextBoxColumn4});
+            this.ircDataGridView1.Location = new System.Drawing.Point(12, 99);
+            this.ircDataGridView1.Name = "ircDataGridView1";
+            this.ircDataGridView1.RowHeadersVisible = false;
+            this.ircDataGridView1.Size = new System.Drawing.Size(859, 177);
+            this.ircDataGridView1.TabIndex = 11;
+            // 
+            // dataGridViewTextBoxColumn9
+            // 
+            this.dataGridViewTextBoxColumn9.DataPropertyName = "time";
+            this.dataGridViewTextBoxColumn9.HeaderText = "time";
+            this.dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
+            // 
+            // dataGridViewTextBoxColumn10
+            // 
+            this.dataGridViewTextBoxColumn10.DataPropertyName = "sender";
+            this.dataGridViewTextBoxColumn10.HeaderText = "sender";
+            this.dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
+            // 
+            // dataGridViewTextBoxColumn11
+            // 
+            this.dataGridViewTextBoxColumn11.DataPropertyName = "command";
+            this.dataGridViewTextBoxColumn11.HeaderText = "command";
+            this.dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
+            // 
+            // dataGridViewTextBoxColumn12
+            // 
+            this.dataGridViewTextBoxColumn12.DataPropertyName = "text";
+            this.dataGridViewTextBoxColumn12.HeaderText = "text";
+            this.dataGridViewTextBoxColumn12.Name = "dataGridViewTextBoxColumn12";
+            this.dataGridViewTextBoxColumn12.Width = 400;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -426,8 +495,8 @@
             this.Controls.Add(this.btnConnect);
             this.Name = "Form1";
             this.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ircDataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -471,6 +540,14 @@
         private System.Windows.Forms.Button btnCancelCreateNewChannel;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnUpdateChannelSetting;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn9;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn10;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn12;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn13;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn14;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn15;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn16;
     }
 }
 

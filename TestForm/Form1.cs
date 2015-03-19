@@ -14,7 +14,8 @@ namespace Irc4TestForm
     {
         Irc4.IrcManager ircManager = new Irc4.IrcManager();
         Irc4.Server current;
-        Dictionary<Irc4.Server, Irc4Control.MyDataTable> tableDic = new Dictionary<Irc4.Server, Irc4Control.MyDataTable>();
+        Irc4.Channel currentChannel;
+        Dictionary<Irc4.IInfo, Irc4Control.MyDataTable> tableDic = new Dictionary<Irc4.IInfo, Irc4Control.MyDataTable>();
         public Form1()
         {
             InitializeComponent();
@@ -39,6 +40,16 @@ namespace Irc4TestForm
             var server = comboBox1.SelectedItem as Irc4.Server;
             ChangeCurrent(server);
         }
+        private void comboBoxCurrentChannel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var channel = comboBoxCurrentChannel.SelectedItem as Irc4.Channel;
+            if (channel != null)
+            {
+                txtChannelDisplayName.Text = channel.DisplayName;
+                ircDataGridView2.DataSource = tableDic[channel];
+                currentChannel = channel;
+            }
+        }
         void ChangeCurrent(Irc4.Server server)
         {
             if (server != null)
@@ -48,6 +59,14 @@ namespace Irc4TestForm
                 ircDataGridView1.DataSource = tableDic[server];
                 btnConnect.Enabled = !server.IsConnected;
                 btnDisconnect.Enabled = server.IsConnected;
+
+                comboBoxCurrentChannel.Items.Clear();
+                foreach (var channel in server.ChannelList)
+                {
+                    comboBoxCurrentChannel.Items.Add(channel);
+                }
+                if (comboBoxCurrentChannel.Items.Count > 0)
+                    comboBoxCurrentChannel.SelectedIndex = 0;
             }
         }
         /// <summary>
@@ -72,6 +91,9 @@ namespace Irc4TestForm
             foreach(Irc4.Server server in ircManager.ServerList)
             {
                 AddServer(server);
+                //var channelInfo = new Irc4.ChannelInfo();
+                //channelInfo.DisplayName = "channame";
+                //server.AddChannel(channelInfo);
             }
             btnCancelCreateNewServer.Enabled = false;
             btnAddServer.Enabled = false;
@@ -85,6 +107,14 @@ namespace Irc4TestForm
         {
             comboBox1.Items.Add(server);
             tableDic.Add(server, new Irc4Control.MyDataTable());
+            foreach (var channel in server.ChannelList)
+            {
+                AddChannel(channel);
+            }
+        }
+        public void AddChannel(Irc4.Channel channel)
+        {
+            tableDic.Add(channel, new Irc4Control.MyDataTable());
         }
         /// <summary>
         /// 
@@ -190,7 +220,23 @@ namespace Irc4TestForm
                     {
                         if(ircDataGridView1.Rows.Count > 0)
                             ircDataGridView1.FirstDisplayedScrollingRowIndex = ircDataGridView1.Rows.Count - 1;
-                    }                        
+                    }
+                }
+                else if (e.serverChannel is Irc4.Channel)
+                {
+                    var channel = (Irc4.Channel)e.serverChannel;
+                    if (!tableDic.ContainsKey(channel))
+                    {
+                        AddChannel(channel);
+                        comboBoxCurrentChannel.Items.Add(channel);
+                    }
+                    var dt = tableDic[channel];
+                    dt.SetLog(e.log);
+                    if (channel == currentChannel)
+                    {
+                        if (ircDataGridView2.Rows.Count > 0)
+                            ircDataGridView2.FirstDisplayedScrollingRowIndex = ircDataGridView2.Rows.Count - 1;
+                    }
                 }
             };
             if (InvokeRequired)
@@ -316,5 +362,23 @@ namespace Irc4TestForm
                 }
             }
         }
+
+        private async void btnJoin_Click(object sender, EventArgs e)
+        {
+            if (currentChannel != null)
+            {
+                await currentChannel.Connect();
+            }
+        }
+
+        private async void btnPart_Click(object sender, EventArgs e)
+        {
+            if (currentChannel != null)
+            {
+                await currentChannel.Disconnect();
+            }
+        }
+
+
     }
 }

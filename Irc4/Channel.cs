@@ -15,12 +15,40 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
+        [NonSerialized()]
+        private Server server_;
+        public Server Server
+        {
+            get
+            {
+                return server_;
+            }
+            set
+            {
+                server_ = value;
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public async Task Connect()
         {
-            //TODO:
-            await Task.Delay(100);
+            if (Server == null)
+                throw new Exception("プロパティServerがnull。");
+            await Server.SendCmd("JOIN " + this.DisplayName);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task Disconnect()
+        {
+            if (Server == null)
+                throw new Exception("プロパティServerがnull。");
+            await Server.SendCmd("PART " + this.DisplayName);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -41,9 +69,21 @@ namespace Irc4
                 throw new ArgumentException("log");
 
         }
-        public void SetInfo(ChannelInfo info)
+        public void SetLog(Log log)
         {
 
+        }
+        public void SetInfo(ChannelInfo info)
+        {
+            this.Clone(info);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return this.DisplayName;
         }
     }
 }

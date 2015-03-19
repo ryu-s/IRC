@@ -12,8 +12,16 @@ namespace Irc4
     /// </summary>
     public interface ISec
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         Task Connect();
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task Disconnect();
     }
     /// <summary>
     /// 
@@ -45,6 +53,10 @@ namespace Irc4
         public string Username { get; set; }
         public string Realname { get; set; }
         public List<Channel> ChannelList { get; set; }
+        public ServerInfo()
+        {
+            ChannelList = new List<Channel>();
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -72,10 +84,24 @@ namespace Irc4
             this.ChannelList = src.ChannelList;
         }
     }
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     public class ChannelInfo : IInfo
     {
         public string DisplayName { get; set; }
+
+        public ChannelInfo Clone()
+        {
+            var work = new ChannelInfo();
+            work.Clone(this);
+            return work;
+        }
+        public void Clone(ChannelInfo src)
+        {
+            this.DisplayName = src.DisplayName;
+        }
     }
     /// <summary>
     /// 
