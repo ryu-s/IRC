@@ -22,6 +22,10 @@ namespace Irc4
         /// </summary>
         /// <returns></returns>
         Task Disconnect();
+        /// <summary>
+        /// 
+        /// </summary>
+        bool IsConnected { get; }
     }
     /// <summary>
     /// 

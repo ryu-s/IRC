@@ -29,6 +29,28 @@ namespace Irc4Control
             this.AllowUserToResizeRows = false;
             this.RowHeadersVisible = false;
 
+            SetColumns();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public new object DataSource
+        {
+            get
+            {
+                return base.DataSource;
+            }
+            set
+            {
+                //Visual Studioのバグで勝手にどんどんカラムが追加されるのを防ぐための措置。
+                SetColumns();
+                base.DataSource = null;
+                base.DataSource = value;
+            }
+        }
+        private void SetColumns()
+        {
+            this.Columns.Clear();
             string column1Name = "time";
             string column2Name = "sender";
             string column3Name = "command";

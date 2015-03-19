@@ -31,6 +31,15 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
+        [NonSerialized()]
+        private bool isConnected;
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsConnected { get { return isConnected; } }
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public async Task Connect()
         {

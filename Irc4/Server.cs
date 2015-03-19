@@ -446,17 +446,21 @@ namespace Irc4
                     {
                         var newChannelInfo = new ChannelInfo();
                         newChannelInfo.DisplayName = log.ChannelName;
-                        AddChannel(newChannelInfo);
+                        channel = AddChannel(newChannelInfo);
+                        //TODO:ここで追加したチャンネルが設定ファイルに追加されていない。
                     }
-                    //未登録のチャンネル。JOINだったら登録する処理か？どんなメッセージが来るかあんまり分からないから情報収集。
-                    using (var sw = new System.IO.StreamWriter(@"C:\notSubscribedChannelMessage.txt", true))
+                    else
                     {
-                        var s = ""
-                            + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") + Environment.NewLine
-                            + log.Command.ToString() + Environment.NewLine
-                            + log.Raw + Environment.NewLine
-                            + "==========================" + Environment.NewLine;
-                        sw.Write(s);
+                        //未登録のチャンネル。JOINだったら登録する処理か？どんなメッセージが来るかあんまり分からないから情報収集。
+                        using (var sw = new System.IO.StreamWriter(@"C:\notSubscribedChannelMessage.txt", true))
+                        {
+                            var s = ""
+                                + DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") + Environment.NewLine
+                                + log.Command.ToString() + Environment.NewLine
+                                + log.Raw + Environment.NewLine
+                                + "==========================" + Environment.NewLine;
+                            sw.Write(s);
+                        }
                     }
                 }
             }
