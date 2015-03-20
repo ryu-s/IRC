@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Irc4
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>目標はライブラリ利用側がServerやChannelを直接扱わなくても良いようにすること。何をするにもinterface経由で済むように。</remarks>
     public class IrcManager
     {
         string settingFilePath = System.Environment.CurrentDirectory + @"\Server.config";
@@ -42,21 +46,33 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
-        public async void Save()
+        public async Task Save()
         {
-            //切断しないと変更後の設定値を取得できない。
-            foreach (var server in serverList)
+            try
             {
-                if (server.IsConnected)
-                    await server.Disconnect();
+                //切断しないと変更後の設定値を取得できない。
+                foreach (var server in serverList)
+                {
+                    if (server.IsConnected)
+                    {
+                        var task = server.Disconnect();
+                        await task;
+                    }
+                }
+                
+                ServerSettings.Instance.ServerInfoList.Clear();
+                foreach (var server in serverList)
+                {
+                    ServerSettings.Instance.ServerInfoList.Add(server.GetInfo());
+                }
+
+                ServerSettings.SaveToXmlFile(settingFilePath);
             }
-            ServerSettings.Instance.ServerInfoList.Clear();
-            foreach (var server in serverList)
+            catch (Exception ex)
             {
-                ServerSettings.Instance.ServerInfoList.Add(server.GetInfo());
+                ExceptionHandler.OnExceptionOccured(this, ex);
             }
-            
-            ServerSettings.SaveToXmlFile(settingFilePath);
+            Console.WriteLine("Save(),4:" + System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
         /// <summary>
         /// 

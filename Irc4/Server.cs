@@ -575,6 +575,27 @@ namespace Irc4
                 InfoHandler(MyLibrary.LogLevel.error, message, ex);
             }
         }
+        public void DisconnectSync()
+        {
+            try
+            {
+                socket.Disconnect();
+            }
+            catch (SocketException ex)
+            {
+                string message = "";
+                switch (ex.SocketErrorCode)
+                {
+                    case SocketError.NotConnected:
+                        message = "未接続の状態で切断処理をしようとした。";
+                        break;
+                    default:
+                        message = "Not Implemented";
+                        break;
+                }
+                InfoHandler(MyLibrary.LogLevel.error, message, ex);
+            }
+        }
         /// <summary>
         /// 
         /// </summary>

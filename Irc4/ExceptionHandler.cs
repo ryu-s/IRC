@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Irc4
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class ExceptionHandler
     {
         public delegate void ExceptionOccuredEventHandler(object sender, ExceptionOccuredEventArgs e);
@@ -20,11 +23,24 @@ namespace Irc4
                 ExceptionOccured(serverChannel, args);
             }
         }
+
+        public static void OnExceptionOccured(object sender, Exception ex, string message = "")
+        {
+            if (ExceptionOccured != null)
+            {
+                var args = new ExceptionOccuredEventArgs();
+                args.DateTime = DateTime.Now;
+                args.Exception = ex;
+                args.Message = message;
+                ExceptionOccured(sender, args);
+            }
+        }
     }
 
     public class ExceptionOccuredEventArgs : EventArgs
     {
         public DateTime DateTime;
         public Exception Exception;
+        public string Message;
     }
 }

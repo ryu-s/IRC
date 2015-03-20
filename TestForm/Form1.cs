@@ -119,11 +119,25 @@ namespace Irc4TestForm
         /// <summary>
         /// 
         /// </summary>
+        bool isSavedWhenClosing = false;
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="e"></param>
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            ircManager.Save();
-            base.OnClosing(e);
+        protected override async void OnClosing(CancelEventArgs e)
+        {            
+            //OnClosing()でawaitをする場合、以下のようにすれば問題無さそう。
+            if (!isSavedWhenClosing)
+            {
+                e.Cancel = true;
+                await ircManager.Save();
+                isSavedWhenClosing = true;
+                this.Close();
+            }
+            else
+            {
+                base.OnClosing(e);
+            }
         }
         void ircManager_ExceptionInfo(object sender, Irc4.IrcExceptionEventArgs e)
         {
