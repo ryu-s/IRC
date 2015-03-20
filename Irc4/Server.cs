@@ -9,13 +9,13 @@ namespace Irc4
 {
     //[改善点]
     //自分が打った文字列が反映されない。
-    //
+    //いつかServerとChannelをinternalにする。
 
     /// <summary>
     /// 
     /// </summary>
     [Serializable]
-    public class Server : ServerInfo, ISec
+    internal class Server : ServerInfo, ISec
     {
         /// <summary>
         /// 一旦切断して、次の接続時に使用する情報。接続中には変更できない値が幾つかあるため。
@@ -65,9 +65,6 @@ namespace Irc4
         /// <param name="info"></param>
         public void SetInfo(ServerInfo info)
         {
-            //if (info.ChannelList == null)
-            //    info.ChannelList = new List<Channel>();
-
             infoModified.Clone(info);
             if (!IsConnected)
                 this.Clone(info);
@@ -76,8 +73,9 @@ namespace Irc4
             //共通化できれば良いのだが。
             foreach (var channel in info.ChannelList)
             {
-                channel.Server = this;
-                OnAddChannel(channel);
+                var c = (Channel)channel;
+                c.Server = this;
+                OnAddChannel(c);
             }
             var message = "設定変更完了。";
             if (IsConnected)
@@ -154,7 +152,7 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
-        public new List<Channel> ChannelList
+        public new List<ISec> ChannelList
         {
             get
             {
@@ -167,7 +165,7 @@ namespace Irc4
                     base.ChannelList = value;
             }
         }
-        public Channel AddChannel(ChannelInfo channelInfo)
+        internal Channel AddChannel(ChannelInfo channelInfo)
         {
             Channel newChannel = null;
             try
@@ -243,7 +241,7 @@ namespace Irc4
                 args.date = DateTime.Now;
                 args.ex = ex;
                 args.logLevel = level;
-                args.serverChannel = this;
+                args.IServerChannel = this;
                 args.Message = message;
                 ExceptionInfo(this, args);
             }
@@ -258,7 +256,7 @@ namespace Irc4
             if (InfoEvent != null)
             {
                 var args = new IrcInfoEventArgs();
-                args.serverChannel = this;
+                args.IServerChannel = this;
                 args.Message = message;
                 args.logLevel = level;
                 args.date = DateTime.Now;
@@ -325,7 +323,7 @@ namespace Irc4
                 var args = new IrcEventArgs();
                 args.date = DateTime.Now;
                 args.logLevel = MyLibrary.LogLevel.notice;
-                args.serverChannel = this;
+                args.IServerChannel = this;
                 ConnectSuccess(this, args);
             }
             var buffer = new byte[2048];
@@ -409,7 +407,7 @@ namespace Irc4
                     var args = new IrcEventArgs();
                     args.date = DateTime.Now;
                     args.logLevel = MyLibrary.LogLevel.notice;
-                    args.serverChannel = this;
+                    args.IServerChannel = this;
                     Disconnected(this, args);
                 }
             }
@@ -439,7 +437,7 @@ namespace Irc4
             Channel channel = null;
             if (!string.IsNullOrWhiteSpace(log.ChannelName))
             {
-                channel = GetChannel(log.ChannelName);
+                channel = (Channel)GetChannel(log.ChannelName);
                 if (channel == null)
                 {
                     if (log.Command == Command.JOIN)
@@ -471,7 +469,7 @@ namespace Irc4
                 var args = new IRCReceiveEventArgs();
                 args.text = log.Text;//TODO:要らない
                 args.log = log;
-                args.serverChannel = (channel == null) ? (IInfo)this : channel;
+                args.IServerChannel = (channel == null) ? (ISec)this : channel;
                 ReceiveEvent(this, args);
             }
 
@@ -504,7 +502,7 @@ namespace Irc4
         /// </summary>
         /// <param name="displayName"></param>
         /// <returns></returns>
-        public Channel GetChannel(string displayName)
+        public ISec GetChannel(string displayName)
         {
             foreach(var channel in this.infoModified.ChannelList)
             {

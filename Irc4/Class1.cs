@@ -10,7 +10,8 @@ namespace Irc4
     /// <summary>
     /// 
     /// </summary>
-    public interface ISec
+    /// <remarks>名前はとりあえず適当。良いのが思いついたら変える。</remarks>
+    public interface ISec : IInfo
     {
         /// <summary>
         /// 
@@ -32,6 +33,7 @@ namespace Irc4
     /// </summary>
     public interface IInfo
     {
+        ServerChannelType Type { get; }
         /// <summary>
         /// 
         /// </summary>
@@ -40,9 +42,21 @@ namespace Irc4
     /// <summary>
     /// 
     /// </summary>
-    [Serializable]
-    public class ServerInfo : IInfo
+    public enum ServerChannelType
     {
+        SERVER,
+        CHANNEL,
+    }
+    /// <summary>
+    /// 
+    /// </summary>
+    [Serializable]
+    [System.Runtime.Serialization.KnownType(typeof(Channel))]//List<ISec>でSerializerが混乱するっぽいからこれが必要。
+    public class ServerInfo : IInfo
+    {        
+        [NonSerialized()]
+        private ServerChannelType type_;
+        public ServerChannelType Type { get { return type_; } }
         public string DisplayName { get; set; }
 
         public string Hostname { get; set; }
@@ -56,10 +70,11 @@ namespace Irc4
         public string Nickname { get; set; }
         public string Username { get; set; }
         public string Realname { get; set; }
-        public List<Channel> ChannelList { get; set; }
+        public List<ISec> ChannelList { get; set; }
         public ServerInfo()
         {
-            ChannelList = new List<Channel>();
+            type_ = ServerChannelType.SERVER;
+            ChannelList = new List<ISec>();
         }
         /// <summary>
         /// 
@@ -94,8 +109,15 @@ namespace Irc4
     [Serializable]
     public class ChannelInfo : IInfo
     {
+        [NonSerialized()]
+        private ServerChannelType type_;
+        public ServerChannelType Type { get { return type_; } }
         public string DisplayName { get; set; }
 
+        public ChannelInfo()
+        {
+            type_ = ServerChannelType.CHANNEL;
+        }
         public ChannelInfo Clone()
         {
             var work = new ChannelInfo();
@@ -136,7 +158,9 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
-        public IInfo serverChannel;
+//        public IInfo serverChannel;
+
+        public ISec IServerChannel;
         /// <summary>
         /// 
         /// </summary>

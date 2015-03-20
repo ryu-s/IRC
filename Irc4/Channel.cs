@@ -10,7 +10,7 @@ namespace Irc4
     /// 
     /// </summary>
     [Serializable]
-    public class Channel : ChannelInfo, ISec
+    internal class Channel : ChannelInfo, ISec
     {
         /// <summary>
         /// 

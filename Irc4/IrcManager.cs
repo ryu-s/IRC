@@ -72,7 +72,6 @@ namespace Irc4
             {
                 ExceptionHandler.OnExceptionOccured(this, ex);
             }
-            Console.WriteLine("Save(),4:" + System.Threading.Thread.CurrentThread.ManagedThreadId);
         }
         /// <summary>
         /// 
@@ -85,12 +84,7 @@ namespace Irc4
                 this.AddServer(serverInfo);
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="info"></param>
-        /// <returns></returns>
-        public Server AddServer(ServerInfo info)
+        public ISec AddServer(ServerInfo info)
         {
             //同じDisplayNameがあったらダメ
             foreach (var server in serverList)
@@ -158,12 +152,92 @@ namespace Irc4
             }
         }
 
-        public List<Server> ServerList
+        public List<ISec> ServerList
         {
             get
             {
-                return serverList;
+                var list = new List<ISec>();
+                list.AddRange(serverList);
+                return list;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public Task<bool> SendCmd(ISec target, string text)
+        {
+            if(target == null)            
+                throw new ArgumentException("target");            
+            if(string.IsNullOrWhiteSpace(text))
+                throw new ArgumentException("text");
+            Server server = null;
+            if (target.Type == ServerChannelType.SERVER)
+                server = (Server)target;
+            else
+                server = ((Channel)target).Server;
+            return server.SendCmd(text);
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public bool SetInfo(ISec server, ServerInfo info)
+        {
+            var ret = false;
+            if (server.Type == ServerChannelType.SERVER)
+            {
+                var s = (Server)server;
+                s.SetInfo(info);
+                ret = true;
+            }
+            return ret;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public bool SetInfo(ISec channel, ChannelInfo info)
+        {
+            var ret = false;
+            if (channel.Type == ServerChannelType.CHANNEL)
+            {
+                var c = (Channel)channel;
+                c.SetInfo(info);
+                ret = true;
+            }
+            return ret;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public ISec AddChannel(ISec server, ChannelInfo info)
+        {
+            ISec channel = null;
+            if (server.Type == ServerChannelType.SERVER)
+            {
+                var s = (Server)server;
+                channel = s.AddChannel(info);
+            }
+            return channel;
+        }
+
+        public List<ISec> GetChannelList(ISec server)
+        {
+            var list = new List<ISec>();
+            var s = (Server)server;
+            list.AddRange(s.ChannelList);
+            return list;
+        }
+
     }
 }

@@ -68,7 +68,7 @@ namespace Irc4
         /// <summary>
         /// 受信したサーバ
         /// </summary>
-        public Server Server { get; private set; }
+        public ISec Server { get; private set; }
         /// <summary>
         /// 
         /// </summary>
@@ -972,7 +972,7 @@ namespace Irc4
         /// </summary>
         /// <param name="server"></param>
         /// <param name="log"></param>
-        public Log(Server server, string log)
+        public Log(ISec server, string log)
         {
             Sender = string.Empty;
             SenderInfo = new UserInfo();
@@ -990,7 +990,7 @@ namespace Irc4
         /// </summary>
         /// <param name="server"></param>
         /// <param name="raw"></param>
-        private void Set(Server server, string raw)
+        private void Set(ISec server, string raw)
         {
             try
             {
