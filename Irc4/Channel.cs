@@ -13,6 +13,16 @@ namespace Irc4
     internal class Channel : ChannelInfo, ISec
     {
         /// <summary>
+        /// 接続に成功した。
+        /// </summary>
+        [field: NonSerialized()]
+        public event IrcEventHandler ConnectSuccess;
+        /// <summary>
+        /// 
+        /// </summary>
+        [field: NonSerialized()]
+        public event IrcEventHandler Disconnected;
+        /// <summary>
         /// 
         /// </summary>
         [NonSerialized()]
@@ -37,6 +47,45 @@ namespace Irc4
         /// 
         /// </summary>
         public bool IsConnected { get { return isConnected; } }
+        /// <summary>
+        /// 
+        /// </summary>
+        [NonSerialized()]
+        private UserList userList_;
+        /// <summary>
+        /// 
+        /// </summary>
+        public UserList UserList { get { return userList_; } private set { userList_ = value; } }
+        /// <summary>
+        /// 
+        /// </summary>
+        public UserInfo MyInfo
+        {
+            get
+            {
+                UserInfo user = UserList.Get(this.Server.MyInfo.NickName);
+                if (user != null)
+                    return user;
+                else
+                    return new UserInfo(this.Server.MyInfo.NickName);//こんな感じでいいだろうか？
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        public Channel()
+        {
+            Initialize();
+        }
+        [System.Runtime.Serialization.OnDeserializing]
+        private void OnDeserializing(System.Runtime.Serialization.StreamingContext c)
+        {
+            Initialize();
+        }
+        private void Initialize()
+        {
+            UserList = new UserList();
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -80,7 +129,63 @@ namespace Irc4
         }
         public void SetLog(Log log)
         {
+            if(log.Command == Command.JOIN)
+            {
+                if (log.SenderInfo.NickName == this.MyInfo.NickName)
+                {
+                    OnConnectSuccess();
+                }
+            }
+            else if(log.Command == Command.RPL_NAMREPLY)
+            {
+                //OnConnectSuccess();
+            }
+            else if (log.Command == Command.PART)
+            {
+                if (log.SenderInfo.NickName == this.MyInfo.NickName)
+                {
+                    OnDisconnected();
+                }
+            }
 
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        void OnConnectSuccess()
+        {
+            if (!this.isConnected)
+            {
+                this.isConnected = true;
+                if (ConnectSuccess != null)
+                {
+                    var args = new IrcEventArgs();
+                    args.IServerChannel = this;
+                    args.logLevel = MyLibrary.LogLevel.notice;
+                    args.date = DateTime.Now;
+                    ConnectSuccess(this, args);
+                }
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>サーバがDisconnect時にが呼ぶことがあるためinternal
+        /// </remarks>
+        internal void OnDisconnected()
+        {
+            if (this.isConnected)
+            {
+                isConnected = false;
+                if (Disconnected != null)
+                {
+                    var args = new IrcEventArgs();
+                    args.IServerChannel = this;
+                    args.logLevel = MyLibrary.LogLevel.notice;
+                    args.date = DateTime.Now;
+                    Disconnected(this, args);
+                }
+            }
         }
         public void SetInfo(ChannelInfo info)
         {

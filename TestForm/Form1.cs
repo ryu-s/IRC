@@ -13,11 +13,8 @@ namespace Irc4TestForm
     public partial class Form1 : Form
     {
         Irc4.IrcManager ircManager = new Irc4.IrcManager();
-//        Irc4.Server current;
-//        Irc4.Channel currentChannel;
         Irc4.ISec currentServer;
         Irc4.ISec currentChannelInterface;
-//        Dictionary<Irc4.IInfo, Irc4Control.MyDataTable> tableDic = new Dictionary<Irc4.IInfo, Irc4Control.MyDataTable>();
         Dictionary<Irc4.ISec, Irc4Control.MyDataTable> tableDic2 = new Dictionary<Irc4.ISec, Irc4Control.MyDataTable>();
         public Form1()
         {
@@ -40,19 +37,13 @@ namespace Irc4TestForm
         /// <param name="e"></param>
         void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-//            var server = comboBox1.SelectedItem as Irc4.Server;
             var server1 = comboBox1.SelectedItem as Irc4.ISec;
             ChangeCurrent(server1);
         }
         private void comboBoxCurrentChannel_SelectedIndexChanged(object sender, EventArgs e)
         {
             var channel = comboBoxCurrentChannel.SelectedItem as Irc4.ISec;
-            if (channel != null)
-            {
-                txtChannelDisplayName.Text = channel.DisplayName;
-                ircDataGridView2.DataSource = tableDic2[channel];
-                currentChannelInterface = channel;
-            }
+            ChangeCurrentChannel(channel);
         }
         void ChangeCurrent(Irc4.ISec server)
         {
@@ -66,13 +57,50 @@ namespace Irc4TestForm
                 btnDisconnect.Enabled = server.IsConnected;
 
                 comboBoxCurrentChannel.Items.Clear();
-                var n = ircManager.GetChannelList(server);
-                foreach (var channel in ircManager.GetChannelList(server))
+                if (ircManager.GetChannelList(server).Count > 0)
                 {
-                    comboBoxCurrentChannel.Items.Add(channel);
+                    comboBoxCurrentChannel.Enabled = true;
+                    foreach (var channel in ircManager.GetChannelList(server))
+                    {
+                        comboBoxCurrentChannel.Items.Add(channel);
+                    }
+                    if (comboBoxCurrentChannel.Items.Count > 0)
+                        comboBoxCurrentChannel.SelectedIndex = 0;
                 }
-                if (comboBoxCurrentChannel.Items.Count > 0)
-                    comboBoxCurrentChannel.SelectedIndex = 0;
+                else
+                {
+                    ChangeCurrentChannel(null);
+                }
+
+            }
+        }
+        void ChangeCurrentChannel(Irc4.ISec channel)
+        {
+            if (channel != null && channel.Type == Irc4.ServerChannelType.CHANNEL)
+            {
+                var info = (Irc4.ChannelInfo)channel;
+                txtChannelDisplayName.Text = channel.DisplayName;
+                ircDataGridView2.DataSource = tableDic2[channel];
+                currentChannelInterface = channel;
+                if (currentServer.IsConnected)
+                {
+                    btnJoin.Enabled = !channel.IsConnected;
+                    btnPart.Enabled = channel.IsConnected;
+                }
+                else
+                {
+                    btnJoin.Enabled = false;
+                    btnPart.Enabled = false;
+                }
+            }
+            else if (channel == null)
+            {
+                txtChannelDisplayName.Text = "";
+                comboBoxCurrentChannel.Text = "";
+                ircDataGridView2.DataSource = null;
+                currentChannelInterface = null;
+                btnJoin.Enabled = false;
+                btnPart.Enabled = false;
             }
         }
         /// <summary>
@@ -94,16 +122,19 @@ namespace Irc4TestForm
         {
             //設定値の読み込み。
             ircManager.Load();
+
             foreach(Irc4.ISec server in ircManager.ServerList)
             {
                 AddServer(server);
             }
-            btnCancelCreateNewServer.Enabled = false;
-            btnAddServer.Enabled = false;
-
-
             if (comboBox1.Items.Count > 0)
                 comboBox1.SelectedIndex = 0;
+            btnCancelCreateNewServer.Enabled = false;
+            btnAddServer.Enabled = false;
+            btnCancelCreateNewChannel.Enabled = false;
+            btnAddChannel.Enabled = false;
+
+
             base.OnLoad(e);
         }
 
@@ -111,6 +142,8 @@ namespace Irc4TestForm
         {
             comboBox1.Items.Add(server);
             tableDic2.Add(server, new Irc4Control.MyDataTable());
+            if (currentServer == null)
+                currentServer = server;
             foreach (var channel in ircManager.GetChannelList(server))
             {
                 AddChannel(channel);
@@ -118,7 +151,9 @@ namespace Irc4TestForm
         }
         public void AddChannel(Irc4.ISec channel)
         {
+            var index = comboBoxCurrentChannel.Items.Add(channel);
             tableDic2.Add(channel, new Irc4Control.MyDataTable());
+            comboBoxCurrentChannel.SelectedIndex = index;
         }
         /// <summary>
         /// 
@@ -199,6 +234,15 @@ namespace Irc4TestForm
                     {
                         btnConnect.Enabled = !e.IServerChannel.IsConnected;
                         btnDisconnect.Enabled = e.IServerChannel.IsConnected;
+                        btnJoin.Enabled = true;
+                    }
+                }
+                else if(e.IServerChannel.Type == Irc4.ServerChannelType.CHANNEL)
+                {
+                    if(e.IServerChannel == currentChannelInterface)
+                    {
+                        btnJoin.Enabled = !e.IServerChannel.IsConnected;
+                        btnPart.Enabled = e.IServerChannel.IsConnected;
                     }
                 }
             };
@@ -217,6 +261,16 @@ namespace Irc4TestForm
                     {
                         btnConnect.Enabled = !e.IServerChannel.IsConnected;
                         btnDisconnect.Enabled = e.IServerChannel.IsConnected;
+                        btnJoin.Enabled = false;
+                        btnPart.Enabled = false;
+                    }
+                }
+                else if (e.IServerChannel.Type == Irc4.ServerChannelType.CHANNEL)
+                {
+                    if (e.IServerChannel == currentChannelInterface)
+                    {
+                        btnJoin.Enabled = !e.IServerChannel.IsConnected;
+                        btnPart.Enabled = e.IServerChannel.IsConnected;
                     }
                 }
             };
@@ -249,7 +303,7 @@ namespace Irc4TestForm
                     if(!tableDic2.ContainsKey(channel))
                     {
                         AddChannel(channel);
-                        comboBoxCurrentChannel.Items.Add(channel);
+                        
                         if (channel == currentChannelInterface)
                         {
                             if (ircDataGridView2.Rows.Count > 0)
@@ -320,21 +374,7 @@ namespace Irc4TestForm
                 }
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnAddServer_Click(object sender, EventArgs e)
-        {
-            var displayName = txtDisplayName.Text;
-            var host = txtHost.Text;
-            var nickname = txtNickname.Text;
-            var serverInfo = CreateServerInfo(displayName, host, nickname);
-            var server = ircManager.AddServer(serverInfo);
-            if(server != null)
-                AddServer(server);
-        }
+
         private Irc4.ServerInfo CreateServerInfo(string displayName, string hostname, string nickname)
         {
             var serverInfo = new Irc4.ServerInfo();
@@ -349,6 +389,29 @@ namespace Irc4TestForm
             serverInfo.Password = "";
             return serverInfo;
         }
+        private Irc4.ChannelInfo CreateChannelInfo(string displayName)
+        {
+            var channelInfo = new Irc4.ChannelInfo();
+            channelInfo.DisplayName = displayName;
+            return channelInfo;
+        }
+
+        private async void btnJoin_Click(object sender, EventArgs e)
+        {
+            if (currentChannelInterface != null)
+            {
+                await currentChannelInterface.Connect();
+            }
+        }
+
+        private async void btnPart_Click(object sender, EventArgs e)
+        {
+            if (currentChannelInterface != null)
+            {
+                await currentChannelInterface.Disconnect();
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -378,25 +441,67 @@ namespace Irc4TestForm
                 {
                     //アイテムが一つしか無い場合、コンボボックスのSelectedIndexChangedが起こらないため、必要な処理をする。
                     ChangeCurrent((Irc4.ISec)comboBox1.Items[0]);
-                } else {
+                }
+                else
+                {
                     comboBox1.SelectedIndex = 0;
                 }
             }
         }
-
-        private async void btnJoin_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnAddServer_Click(object sender, EventArgs e)
         {
-            if (currentChannelInterface != null)
+            var displayName = txtDisplayName.Text;
+            var host = txtHost.Text;
+            var nickname = txtNickname.Text;
+            var serverInfo = CreateServerInfo(displayName, host, nickname);
+            var server = ircManager.AddServer(serverInfo);
+            if (server != null)
+                AddServer(server);
+        }
+
+        private void btnCreateNewChannel_Click(object sender, EventArgs e)
+        {
+            btnCreateNewChannel.Enabled = false;
+            btnAddChannel.Enabled = true;
+            btnCancelCreateNewChannel.Enabled = true;
+            ChangeCurrentChannel(null);
+        }
+
+        private void btnAddChannel_Click(object sender, EventArgs e)
+        {
+            if (currentServer != null)
             {
-                await currentChannelInterface.Connect();
+                var displayName = txtChannelDisplayName.Text;
+                var channelInfo = CreateChannelInfo(displayName);
+                var channel = ircManager.AddChannel(currentServer, channelInfo);
+                if (channel != null)
+                {
+                    AddChannel(channel);
+                }
             }
         }
 
-        private async void btnPart_Click(object sender, EventArgs e)
+        private void btnCancelCreateNewChannel_Click(object sender, EventArgs e)
         {
-            if (currentChannelInterface != null)
+            btnCreateNewChannel.Enabled = true;
+            btnAddChannel.Enabled = false;
+            btnCancelCreateNewChannel.Enabled = false;
+            if (comboBoxCurrentChannel.Items.Count > 0)
             {
-                await currentChannelInterface.Disconnect();
+                if (comboBoxCurrentChannel.Items.Count == 1)
+                {
+                    //アイテムが一つしか無い場合、コンボボックスのSelectedIndexChangedが起こらないため、必要な処理をする。
+                    ChangeCurrentChannel((Irc4.ISec)comboBoxCurrentChannel.Items[0]);
+                }
+                else
+                {
+                    comboBoxCurrentChannel.SelectedIndex = 0;
+                }
             }
         }
 

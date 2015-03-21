@@ -116,6 +116,15 @@ namespace Irc4
 
         public ChannelInfo()
         {
+            Initialize();
+        }
+        [System.Runtime.Serialization.OnDeserializing]
+        private void OnDeserializing(System.Runtime.Serialization.StreamingContext c)
+        {
+            Initialize();
+        }
+        private void Initialize()
+        {
             type_ = ServerChannelType.CHANNEL;
         }
         public ChannelInfo Clone()
