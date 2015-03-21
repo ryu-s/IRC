@@ -157,44 +157,44 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
-        internal new List<Channel> ChannelList
-        {
-            get
-            {
-                //List<ISec> chanList = null;
-                //if (this.IsConnected)
-                //    chanList = base.ChannelList;
-                //else
-                //    chanList = infoModified.ChannelList;
-                //var list = new List<Channel>();
-                //foreach(var channelISec in chanList)
-                //{
-                //    list.Add((Channel)channelISec);
-                //}
-                //return list;
-//                return base.ChannelList.AsEnumerable().OfType<Channel>().ToList();
-                var a = base.ChannelList;
-                var b = a.Cast<Channel>().ToList();
-                string[] ss = null;
+//        internal new List<Channel> ChannelList
+//        {
+//            get
+//            {
+//                //List<ISec> chanList = null;
+//                //if (this.IsConnected)
+//                //    chanList = base.ChannelList;
+//                //else
+//                //    chanList = infoModified.ChannelList;
+//                //var list = new List<Channel>();
+//                //foreach(var channelISec in chanList)
+//                //{
+//                //    list.Add((Channel)channelISec);
+//                //}
+//                //return list;
+////                return base.ChannelList.AsEnumerable().OfType<Channel>().ToList();
+//                var a = base.ChannelList;
+//                var b = a.Cast<Channel>().ToList();
+//                string[] ss = null;
                 
-                return b;
-            }
-            set
-            {
-                //var list = new List<ISec>();
-                //foreach (var channel in value)
-                //{
-                //    list.Add(channel);
-                //}
-                //infoModified.ChannelList = list;
-                //if(!IsConnected)
-                //    base.ChannelList = list;
-//                base.ChannelList = value.AsEnumerable().OfType<ISec>().ToList();
-                var a = value;
-                var b = a.Cast<ISec>().ToList();
-                base.ChannelList = b;
-            }
-        }
+//                return b;
+//            }
+//            set
+//            {
+//                //var list = new List<ISec>();
+//                //foreach (var channel in value)
+//                //{
+//                //    list.Add(channel);
+//                //}
+//                //infoModified.ChannelList = list;
+//                //if(!IsConnected)
+//                //    base.ChannelList = list;
+////                base.ChannelList = value.AsEnumerable().OfType<ISec>().ToList();
+//                var a = value;
+//                var b = a.Cast<ISec>().ToList();
+//                base.ChannelList = b;
+//            }
+//        }
         internal Channel AddChannel(ChannelInfo channelInfo)
         {
             Channel newChannel = null;
@@ -204,7 +204,9 @@ namespace Irc4
                 //TODO:
                 newChannel.Server = this;
                 newChannel.SetInfo(channelInfo);
-                base.ChannelList.Add(newChannel);
+                var list = base.ChannelList.ToList();
+                list.Add(newChannel);
+                base.ChannelList = list.ToArray();
                 OnAddChannel(newChannel);
             }
             catch (Exception ex)
@@ -465,7 +467,7 @@ namespace Irc4
 
                 foreach (var channel in ChannelList)
                 {
-                    channel.OnDisconnected();
+                    ((Channel)channel).OnDisconnected();
                 }
                 var args = new IrcEventArgs();
                 args.date = DateTime.Now;

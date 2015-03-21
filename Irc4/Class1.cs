@@ -70,11 +70,11 @@ namespace Irc4
         public string Nickname { get; set; }
         public string Username { get; set; }
         public string Realname { get; set; }
-        public List<ISec> ChannelList { get; set; }
+        public ISec[] ChannelList { get; set; }
         public ServerInfo()
         {
             type_ = ServerChannelType.SERVER;
-            ChannelList = new List<ISec>();
+            ChannelList = new ISec[0];
         }
         /// <summary>
         /// 
