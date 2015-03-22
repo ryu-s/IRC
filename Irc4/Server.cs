@@ -347,6 +347,7 @@ namespace Irc4
         /// </summary>
         public async Task Connect()
         {
+            Console.WriteLine("Server::Connect():" + System.Threading.Thread.CurrentThread.ManagedThreadId);
             var fatalErrorOccured = false;
 
             //存在しないホスト名だった場合に例外を投げるが、接続試行中にホスト名を変更すると、catch内で間違っている方のホスト名が参照できない。

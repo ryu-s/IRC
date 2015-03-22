@@ -57,7 +57,6 @@ namespace UnitTestProject1
 
             //接続
             await server.Connect();
-
         }
 
         private Irc4.ServerInfo GetServerInfo()

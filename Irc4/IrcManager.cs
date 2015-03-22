@@ -14,8 +14,10 @@ namespace Irc4
     {
         string settingFilePath = System.Environment.CurrentDirectory + @"\Server.config";
         List<Server> serverList = new List<Server>();
-
-
+        /// <summary>
+        /// 再接続の間隔（分単位）
+        /// </summary>
+        int reconnectIntervalMin = 1;
         /// <summary>
         /// 接続に成功した。
         /// </summary>
@@ -125,7 +127,7 @@ namespace Irc4
                 newServer.InfoEvent += newServer_InfoEvent;
                 newServer.ExceptionInfo += newServer_ExceptionInfo;
                 newServer.SetInfo(info);
-                reconnectStateDic.Add(newServer, new ReconnectState());
+                reconnectStateDic.Add(newServer, new ReconnectContext());
                 serverList.Add(newServer);
             }
             catch (Exception ex)
@@ -160,8 +162,11 @@ namespace Irc4
         /// <remarks>
         /// AddServerでServerを追加する。
         /// </remarks>
-        Dictionary<Server, ReconnectState> reconnectStateDic = new Dictionary<Server, ReconnectState>();
-        class ReconnectState
+        Dictionary<Server, ReconnectContext> reconnectStateDic = new Dictionary<Server, ReconnectContext>();
+        /// <summary>
+        /// 
+        /// </summary>
+        class ReconnectContext
         {
             /// <summary>
             /// 再接続を試みた回数
@@ -186,28 +191,27 @@ namespace Irc4
         {
             if (!server.IsDisconnectedExpected)
             {                
-                Func<ReconnectState, Task> Reconnect = async (s) =>
+                Func<ReconnectContext, Task> Reconnect = async (s) =>
                 {
                     s.trialCounter++;
                     await s.Server.Connect();
                     MessageHandler.OnMessageEvent(this, "再接続");
                 };
                 //再接続が必要。
-                var state = reconnectStateDic[server];
-                if (state.Timer == null)
+                var context = reconnectStateDic[server];
+                if (context.Timer == null)
                 {
-                    int reconnectIntervalMin = 1;
-                    state.Server = server;
-                    state.Timer = new System.Timers.Timer();
-                    state.Timer.Interval = reconnectIntervalMin * 60 * 1000;
-                    state.Timer.Elapsed += async (sender1, e1) =>
+                    context.Server = server;
+                    context.Timer = new System.Timers.Timer();
+                    context.Timer.Interval = reconnectIntervalMin * 60 * 1000;
+                    context.Timer.Elapsed += async (sender1, e1) =>
                     {
-                        await Reconnect(state);
+                        await Reconnect(context);
                     };
-                    state.Timer.Enabled = true;
-                    state.Timer.Start();
+                    context.Timer.Enabled = true;
+                    context.Timer.Start();
                 }
-                await Reconnect(state);
+                await Reconnect(context);
             }
         }
         void newServer_ExceptionInfo(object sender, IrcExceptionEventArgs e)
@@ -235,12 +239,12 @@ namespace Irc4
             //自動再接続用のコンテキストを無効化。
             if (e.IServerChannel.Type == ServerChannelType.SERVER)
             {
-                var state = reconnectStateDic[(Server)e.IServerChannel];
-                if (state.Timer != null)
+                var context = reconnectStateDic[(Server)e.IServerChannel];
+                if (context.Timer != null)
                 {
-                    state.Timer.Stop();
-                    state.trialCounter = 0;
-                    state.Timer = null;
+                    context.Timer.Stop();
+                    context.trialCounter = 0;
+                    context.Timer = null;
                 }
             }
 
