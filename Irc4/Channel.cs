@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using ryu_s.MyCommon;
 namespace Irc4
 {
     /// <summary>
@@ -173,7 +173,7 @@ namespace Irc4
                 {
                     var args = new IrcEventArgs();
                     args.IServerChannel = this;
-                    args.logLevel = MyLibrary.LogLevel.notice;
+                    args.logLevel = LogLevel.notice;
                     args.date = DateTime.Now;
                     ConnectSuccess(this, args);
                 }
@@ -193,7 +193,7 @@ namespace Irc4
                 {
                     var args = new IrcEventArgs();
                     args.IServerChannel = this;
-                    args.logLevel = MyLibrary.LogLevel.notice;
+                    args.logLevel = LogLevel.notice;
                     args.date = DateTime.Now;
                     Disconnected(this, args);
                 }

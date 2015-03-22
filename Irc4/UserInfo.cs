@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using ryu_s.MyCommon;
 namespace Irc4
 {
     delegate void ModeSetDelegate(char mode);
@@ -194,7 +194,7 @@ namespace Irc4
                 return;
 
             string pattern = @":?(?<nickname>[^\s]*?)!(?<loginname>[^\s]*?)@(?<hostname>[^\s]*?)$";
-            var dic = MyLibrary.MyRegex.MatchNamedCaptures(pattern, sender);
+            var dic = MyRegex.MatchNamedCaptures(pattern, sender);
 
             if (dic != null)
             {

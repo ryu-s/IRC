@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
-
+using ryu_s.Net;
+using ryu_s.MyCommon;
 namespace Irc4
 {
     //[改善点]
@@ -30,11 +31,11 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
-        private MyLibrary.MySocket.SocketAsync socket;
+        private SocketAsync socket;
         /// <summary>
         /// 
         /// </summary>
-        private MyLibrary.MySocket.SplitBuffer splitBuffer;
+        private SplitBuffer splitBuffer;
         /// <summary>
         /// 接続に成功した。
         /// </summary>
@@ -87,11 +88,11 @@ namespace Irc4
         private void Initialize()
         {
             infoModified = new ServerInfo();
-            socket = new MyLibrary.MySocket.SocketAsync();
+            socket = new SocketAsync();
             LineTerminator = "\r\n";
             MyInfo = new UserInfo();
             IsDisconnectedExpected = false;
-            splitBuffer = new MyLibrary.MySocket.SplitBuffer(this, LineTerminator);
+            splitBuffer = new SplitBuffer(this, LineTerminator);
             splitBuffer.AddedEvent += splitBuffer_AddedEvent; 
         }
         /// <summary>
@@ -115,7 +116,7 @@ namespace Irc4
             var message = "設定変更完了。";
             if (IsConnected)
                 message += "次回接続時に反映されます。";
-            InfoHandler(MyLibrary.LogLevel.notice, message);
+            InfoHandler(LogLevel.notice, message);
         }
         internal Channel AddChannel(ChannelInfo channelInfo)
         {
@@ -144,7 +145,7 @@ namespace Irc4
             }
             catch (Exception ex)
             {
-                InfoHandler(MyLibrary.LogLevel.error, ex.Message, ex);
+                InfoHandler(LogLevel.error, ex.Message, ex);
             }
             return newChannel;
         }
@@ -281,7 +282,7 @@ namespace Irc4
         /// <param name="level"></param>
         /// <param name="message"></param>
         /// <param name="ex"></param>
-        private void InfoHandler(MyLibrary.LogLevel level, string message, Exception ex)
+        private void InfoHandler(LogLevel level, string message, Exception ex)
         {
             var additional = "";
             var logPath = @"C:\Irc4Exception.txt";
@@ -318,7 +319,7 @@ namespace Irc4
         /// </summary>
         /// <param name="level"></param>
         /// <param name="message"></param>
-        private void InfoHandler(MyLibrary.LogLevel level, string message)
+        private void InfoHandler(LogLevel level, string message)
         {
             if (InfoEvent != null)
             {
@@ -386,13 +387,13 @@ namespace Irc4
                         message = "Not Implemented";
                         break;
                 }
-                InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
             catch (Exception ex)
             {
                 var message = "Not Implemented";
-                InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
             if (fatalErrorOccured)
@@ -412,7 +413,7 @@ namespace Irc4
             {
                 var args = new IrcEventArgs();
                 args.date = DateTime.Now;
-                args.logLevel = MyLibrary.LogLevel.notice;
+                args.logLevel = LogLevel.notice;
                 args.IServerChannel = this;
                 ConnectSuccess(this, args);
             }            
@@ -445,13 +446,13 @@ namespace Irc4
                             break;
                     }
                     if(!IsDisconnectedExpected)
-                        InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                        InfoHandler(LogLevel.error, message, ex);
                     fatalErrorOccured = true;
                 }
                 catch (Exception ex)
                 {
                     var message = "Not Implemented";
-                    InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                    InfoHandler(LogLevel.error, message, ex);
                     fatalErrorOccured = true;
                 }
                 if (fatalErrorOccured)
@@ -481,13 +482,13 @@ namespace Irc4
                         message = "Not Implemented";
                         break;
                 }
-                InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
             catch (Exception ex)
             {
                 var message = "Not Implemented";
-                InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(LogLevel.error, message, ex);
                 fatalErrorOccured = true;
             }
             finally
@@ -517,7 +518,7 @@ namespace Irc4
                 }
                 var args = new IrcEventArgs();
                 args.date = DateTime.Now;
-                args.logLevel = MyLibrary.LogLevel.notice;
+                args.logLevel = LogLevel.notice;
                 args.IServerChannel = this;
                 Disconnected(this, args);
             }
@@ -527,7 +528,7 @@ namespace Irc4
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        async void splitBuffer_AddedEvent(object sender, MyLibrary.MySocket.AddedEventArgs e)
+        async void splitBuffer_AddedEvent(object sender, AddedEventArgs e)
         {
             var log = new Irc4.Log(this, e.AddedString);
             await SetLog(log);
@@ -650,7 +651,7 @@ namespace Irc4
                         message = "Not Implemented";
                         break;
                 }
-                InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(LogLevel.error, message, ex);
             }
             return b;
         }
@@ -684,7 +685,7 @@ namespace Irc4
                         message = "Not Implemented";
                         break;
                 }
-                InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                InfoHandler(LogLevel.error, message, ex);
             }
         }
         /// <summary>
@@ -697,31 +698,6 @@ namespace Irc4
             {
                 IsDisconnectedExpected = true;
                 await Quit();
-            }
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        public void DisconnectSync()
-        {
-            try
-            {
-                if(IsConnected)
-                    socket.Disconnect();
-            }
-            catch (SocketException ex)
-            {
-                string message = "";
-                switch (ex.SocketErrorCode)
-                {
-                    case SocketError.NotConnected:
-                        message = "未接続の状態で切断処理をしようとした。";
-                        break;
-                    default:
-                        message = "Not Implemented";
-                        break;
-                }
-                InfoHandler(MyLibrary.LogLevel.error, message, ex);
             }
         }
         /// <summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ryu_s.MyCommon;
 namespace Irc4
 {
     /// <summary>
@@ -194,7 +195,7 @@ namespace Irc4
                             //ネットワークから強制的に追い出す。KICKはチャンネルから。
                             //:sjc-chat01.ustream.tv KILL IG_91835 :chat12!sjc-chat01!sjc-chat01.ustream.tv (Forced nick collision)
                             string pattern2 = @"(?<killedBy>[^\s]*) (?<comments>.*)$";
-                            var dictionary2 = MyLibrary.MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
+                            var dictionary2 = MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
                             log.Dictionary.Add("killedBy", dictionary2["killedBy"]);
                             log.Dictionary.Add("comments", dictionary2["comments"]);
                             log.Text = string.Format("{0} KILL {1} {2}", log.Dictionary["killedBy"], log.Dictionary["receiver"], log.Dictionary["comments"]);
@@ -219,7 +220,7 @@ namespace Irc4
 				Pattern=@":?(?<sender>[^\s]*) (?<command>[^\s]*) (?<mynick>[^\s]*) :?(?<body>.*)$",
 				Process=(log, raw)=>{
                     string pattern2 = @"^.* (?<myname>[^\s]+![^\s]+@[^\s]+).*$";
-                            var dictionary2 = MyLibrary.MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
+                            var dictionary2 = MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
                             if (dictionary2 != null)
                             { 
                                 log.Dictionary.Add("myname", dictionary2["myname"]);
@@ -227,7 +228,7 @@ namespace Irc4
                             else
                             {
                                 string pattern3 = @".* (?<myname>[^\s]+)$";
-                                var dictionary3 = MyLibrary.MyRegex.MatchNamedCaptures(pattern3, log.Dictionary["body"]);
+                                var dictionary3 = MyRegex.MatchNamedCaptures(pattern3, log.Dictionary["body"]);
                                 if(dictionary3 != null)
                                     log.Dictionary.Add("myname", dictionary3["myname"]);
                             }
@@ -242,7 +243,7 @@ namespace Irc4
 				Pattern=@":?(?<sender>[^\s]*) (?<command>[^\s]*) (?<receiver>[^\s]*) :?(?<body>.*)$",
 				Process=(log, raw)=>{
                             string pattern2 = @".* (?<myhost>[^\s,]*),.* (?<version>[^\s]*)$";
-                            var dictionary2 = MyLibrary.MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
+                            var dictionary2 = MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
                             log.Dictionary.Add("myhost", dictionary2["myhost"]);
                             log.Dictionary.Add("version", dictionary2["version"]);
 
@@ -346,7 +347,7 @@ namespace Irc4
                     //:irc.example.net 251 nickname :There are 3 users and 0 services on 1 servers
                     log.Text = log.Dictionary["body"];
                     string pattern2 = @"^.* (?<users>[\d]*) .* (?<invisible>[\d]*) .* (?<servers>[\d]*) .*$";
-                    var dictionary2 = MyLibrary.MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
+                    var dictionary2 = MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
                     log.Dictionary.Add("users", dictionary2["users"]);
                     log.Dictionary.Add("invisible", dictionary2["invisible"]);
                     log.Dictionary.Add("servers", dictionary2["servers"]);
@@ -451,7 +452,7 @@ namespace Irc4
 				Name="317",
 				Pattern=@":?(?<sender>[^\s]*) (?<command>[^\s]*) (?<receiver>[^\s]*) (?<who>[^\s]*) (?<idleseconds>[^\s]*) (?<signontime>[^\s]*) :?(?<body>.*)$",
 				Process=(log, raw)=>{
-                    DateTime signonTime = MyLibrary.MyTime.FromUnixTime(long.Parse(log.Dictionary["signontime"]));
+                    DateTime signonTime = MyTime.FromUnixTime(long.Parse(log.Dictionary["signontime"]));
                     log.Text = string.Format("{0} seconds idle, signon time={1}", log.Dictionary["idleseconds"], signonTime.ToString("yyyy/MM/dd HH:mm:ss"));
 				}
 			},
@@ -507,7 +508,7 @@ namespace Irc4
 				Process=(log, raw)=>{
                     long unixTime;
                     long.TryParse(log.Dictionary["createTime"], out unixTime);
-                    DateTime createTime = MyLibrary.MyTime.FromUnixTime(unixTime);
+                    DateTime createTime = MyTime.FromUnixTime(unixTime);
                     log.Text = "チャンネル作成日時：" + createTime.ToString("yyyy/MM/dd HH:mm:ss");
 				}
 			},
@@ -530,7 +531,7 @@ namespace Irc4
 				Pattern=@":?(?<sender>[^\s]*) (?<command>[^\s]*) (?<receiver>[^\s]*) (?<channel>[^\s]*) (?<nick>[^\s]*) (?<time>[^\s]*)$",
 				Process=(log, raw)=>{
                     log.Dictionary["nick"] = (new UserInfo(log.Dictionary["nick"]).NickName);
-                    DateTime topicTime = MyLibrary.MyTime.FromUnixTime(long.Parse(log.Dictionary["time"]));
+                    DateTime topicTime = MyTime.FromUnixTime(long.Parse(log.Dictionary["time"]));
                     log.Text = string.Format("{0} {1}", log.Dictionary["nick"], topicTime.ToString("yyyy/MM/dd HH:mm:ss"));
                 }
 			},
@@ -545,7 +546,7 @@ namespace Irc4
 				Name="346",
 				Pattern=@":?(?<sender>[^\s]*) (?<command>[^\s]*) (?<receiver>[^\s]*) (?<channel>[^\s]*) (?<invitemask>[^\s]*) (?<adduser>[^\s]*) (?<addtime>[^\s]*)$",
 				Process=(log, raw)=>{
-                    DateTime addTime = MyLibrary.MyTime.FromUnixTime(long.Parse(log.Dictionary["addtime"]));
+                    DateTime addTime = MyTime.FromUnixTime(long.Parse(log.Dictionary["addtime"]));
                     log.Text = string.Format("{0} {1} {2}", log.Dictionary["invitemask"], log.Dictionary["adduser"], addTime.ToString("yyyy/MM/dd HH:mm:ss"));
 				}
 			},
@@ -560,7 +561,7 @@ namespace Irc4
 				Name="348",
 				Pattern=@":?(?<sender>[^\s]*) (?<command>[^\s]*) (?<receiver>[^\s]*) (?<channel>[^\s]*) (?<exceptionmask>[^\s]*) (?<adduser>[^\s]*) (?<addtime>[^\s]*)$",
 				Process=(log, raw)=>{
-                    DateTime addTime = MyLibrary.MyTime.FromUnixTime(long.Parse(log.Dictionary["addtime"]));
+                    DateTime addTime = MyTime.FromUnixTime(long.Parse(log.Dictionary["addtime"]));
                     log.Text = string.Format("{0} {1} {2}", log.Dictionary["exceptionmask"], log.Dictionary["adduser"], addTime.ToString("yyyy/MM/dd HH:mm:ss"));
 				}
 			},
@@ -642,7 +643,7 @@ namespace Irc4
                             log.Dictionary.TryGetValue("adduser", out adduser);
                             if (!string.IsNullOrEmpty(addtime))
                             {
-                                DateTime addDateTime = MyLibrary.MyTime.FromUnixTime(long.Parse(addtime));
+                                DateTime addDateTime = MyTime.FromUnixTime(long.Parse(addtime));
                                 log.Text = string.Format("{0} {1} {2}", log.Dictionary["banid"], addDateTime.ToString("yyyy/MM/dd HH:mm:ss"), adduser);
                             }
                             else
@@ -721,7 +722,7 @@ namespace Irc4
                                                 //:sjc-chat08.ustream.tv 378 IG_91835 IG_91835 :is connecting from *@119.95.240.49.ap.yournet.ne.jp 49.240.95.119
                             log.Text = log.Dictionary["who"] + " " + log.Dictionary["body"];
                             string pattern2 = @".* \*@(?<userhost>[^\s]*) (?<ipaddr>[^\s]*)$";
-                            var dictionary2 = MyLibrary.MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
+                            var dictionary2 = MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
                             log.Dictionary.Add("userhost", dictionary2["userhost"]);
                             log.Dictionary.Add("ipaddr", dictionary2["ipaddr"]);
 				}
@@ -882,7 +883,7 @@ namespace Irc4
                     log.Text = log.Dictionary["body"];
                     //2014/12/29 パターンが上手く適合していなかったため修正
                     string pattern2 = @".* ?(?<channel_from>[#|&|!][^\s]*) ?[^#&!]* ?(?<channel_to>[#|&|!][^\s]*) ?.*";
-                    var dictionary2 = MyLibrary.MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
+                    var dictionary2 = MyRegex.MatchNamedCaptures(pattern2, log.Dictionary["body"]);
                     log.Dictionary.Add("channel_from", dictionary2["channel_from"]);
                     log.Dictionary.Add("channel_to", dictionary2["channel_to"]);
                 }
@@ -1016,7 +1017,7 @@ namespace Irc4
                 {
                     var replyStruct = replys.First();
                     string pattern = replyStruct.Pattern;
-                    Dictionary = MyLibrary.MyRegex.MatchNamedCaptures(pattern, raw);
+                    Dictionary = MyRegex.MatchNamedCaptures(pattern, raw);
                     if (Dictionary == null)
                         throw new Exception("パターンにマッチしなかった！ raw=" + raw);
                     if (Dictionary.ContainsKey("sender"))

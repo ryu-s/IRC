@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
-
+using ryu_s.MyCommon;
 namespace Irc4
 {
     /// <summary>
@@ -185,7 +185,7 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
-        public MyLibrary.LogLevel logLevel;
+        public LogLevel logLevel;
     }
     public class IrcInfoEventArgs : IrcEventArgs
     {

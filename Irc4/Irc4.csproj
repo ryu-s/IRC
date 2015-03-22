@@ -54,9 +54,9 @@
     <Compile Include="UserList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MyLibrary\MyLibrary\MyLibrary.csproj">
-      <Project>{06091530-3c57-4179-b9e3-860872cdd38b}</Project>
-      <Name>MyLibrary</Name>
+    <ProjectReference Include="..\..\MyCommon\MyCommon\MyCommon.csproj">
+      <Project>{96e6a872-52b6-4cb7-aa3e-51b1bc21c6ae}</Project>
+      <Name>MyCommon</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

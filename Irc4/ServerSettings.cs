@@ -13,11 +13,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using ryu_s.MyCommon;
 namespace Irc4
 {
 
     [DataContract]
-    class ServerSettings : MyLibrary.MySettingsBase<ServerSettings>
+    class ServerSettings : MySettingsBase<ServerSettings>
     {
         /// <summary>
         /// 実行されたくないからprivateにしたいけど、そうするとMySettingsBaseから呼び出せない。どうすればいいのか・・・。
@@ -43,7 +44,7 @@ namespace Irc4
             set
             {
                 _serverInfoList = value;
-                OnChanged(MyLibrary.Tool.GetName(() => ServerSettings.Instance.ServerInfoList));
+                OnChanged(Tool.GetName(() => ServerSettings.Instance.ServerInfoList));
             }
         }
         /// <summary>
