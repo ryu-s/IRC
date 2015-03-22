@@ -232,6 +232,7 @@ namespace Irc4
         /// <param name="e"></param>
         void newServer_ConnectSuccess(object sender, IrcEventArgs e)
         {
+            //自動再接続用のコンテキストを無効化。
             if (e.IServerChannel.Type == ServerChannelType.SERVER)
             {
                 var state = reconnectStateDic[(Server)e.IServerChannel];
@@ -242,6 +243,20 @@ namespace Irc4
                     state.Timer = null;
                 }
             }
+
+            var name = "";
+            if (e.IServerChannel.Type == ServerChannelType.CHANNEL)
+            {
+                var channel = (Channel)e.IServerChannel;
+                name = string.Format("{0}({1})", channel.DisplayName, channel.Server.DisplayName);
+            }
+            else
+            {
+                name = e.IServerChannel.DisplayName;
+            }
+            MessageHandler.OnMessageEvent(this, "接続完了:" + name);
+
+            //接続成功のイベントを起こす。
             if (ConnectSuccess != null)
             {
                 ConnectSuccess(sender, e);

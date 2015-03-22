@@ -33,6 +33,9 @@ namespace Irc4
     /// </summary>
     public interface IInfo
     {
+        /// <summary>
+        /// 
+        /// </summary>
         ServerChannelType Type { get; }
         /// <summary>
         /// 

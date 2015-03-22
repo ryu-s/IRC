@@ -172,20 +172,16 @@ namespace Irc4
         /// <summary>
         /// 表示名
         /// </summary>
+        /// <remarks>接続状態に関わらずいつでも変更可能</remarks>
         public new string DisplayName
         {
             get
             {
-                if (this.IsConnected)
-                    return base.DisplayName;
-                else
-                    return infoModified.DisplayName;
+                return base.DisplayName;
             }
             set
             {
-                infoModified.DisplayName = value;
-                if (!IsConnected)
-                    base.DisplayName = value;
+                base.DisplayName = value;
             }
         }
         /// <summary>
@@ -195,7 +191,7 @@ namespace Irc4
         {
             get
             {
-                if (this.IsConnected)
+                if (IsConnected)
                     return base.Hostname;
                 else
                     return infoModified.Hostname;
@@ -226,6 +222,25 @@ namespace Irc4
                     base.Username = value;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public new int Port
+        {
+            get
+            {
+                if (this.IsConnected)
+                    return base.Port;
+                else
+                    return infoModified.Port;
+            }
+            set
+            {
+                infoModified.Port = value;
+                if (!IsConnected)
+                    base.Port = value;
+            }
+        }
 
 
         void channel_Disconnected(object sender, IrcEventArgs e)
@@ -253,7 +268,7 @@ namespace Irc4
         /// <summary>
         /// 接続済みか。
         /// </summary>
-        public bool IsConnected
+        public virtual bool IsConnected
         {
             get
             {
@@ -333,14 +348,17 @@ namespace Irc4
         public async Task Connect()
         {
             var fatalErrorOccured = false;
-            IsDisconnectedExpected = false;
-            //Update my info
-            this.Clone(infoModified);
+
             //存在しないホスト名だった場合に例外を投げるが、接続試行中にホスト名を変更すると、catch内で間違っている方のホスト名が参照できない。
             //そこで、一旦コピーしておく。
             var hostname = this.Hostname;
             try
             {
+                if (IsConnected)
+                    throw new Exception("既に接続済み");
+                IsDisconnectedExpected = false;
+                //Update my info
+                this.Clone(infoModified);
                 await socket.ConnectAsync(hostname, this.Port);
             }
             catch (SocketException ex)
@@ -674,8 +692,11 @@ namespace Irc4
         /// <returns></returns>
         public async Task Disconnect()
         {
-            IsDisconnectedExpected = true;
-            await Quit();
+            if (IsConnected)
+            {
+                IsDisconnectedExpected = true;
+                await Quit();
+            }
         }
         /// <summary>
         /// 
@@ -684,7 +705,8 @@ namespace Irc4
         {
             try
             {
-                socket.Disconnect();
+                if(IsConnected)
+                    socket.Disconnect();
             }
             catch (SocketException ex)
             {
