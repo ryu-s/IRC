@@ -1049,7 +1049,7 @@ namespace Irc4
             }
             catch (Exception ex)
             {
-                ExceptionHandler.OnExceptionOccured(this, ex);
+                MessageHandler.OnExceptionOccured(this, ex);
             }
             // enum Commnad
             if (Command == Command.UNKNOWN && StrCommand != "000")

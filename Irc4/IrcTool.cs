@@ -43,6 +43,25 @@ namespace Irc4
             return Command.UNKNOWN;
         }
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        public static string GetCommandStr(Command command)
+        {
+            var name = Enum.GetName(typeof(Command), command);
+            var str = "";
+            if(name.StartsWith("ERR_") || name.StartsWith("RPL_"))
+            {
+                str = string.Format("{0:000}", (int)command);
+            }
+            else
+            {
+                str = name;
+            }
+            return str;
+        }
+        /// <summary>
         /// 文字列がチャンネル名か（RFCのチャンネル名に適合しているか）
         /// </summary>
         /// <param name="channelName"></param>

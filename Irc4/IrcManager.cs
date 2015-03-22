@@ -39,12 +39,22 @@ namespace Irc4
         /// <summary>
         /// 
         /// </summary>
-        public IrcManager()
+        private IrcManager()
         {
-            Load();
         }
+        private static IrcManager instance = new IrcManager();
         /// <summary>
         /// 
+        /// </summary>
+        public static IrcManager Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+        /// <summary>
+        /// 設定を保存する。
         /// </summary>
         public async Task Save()
         {
@@ -55,7 +65,7 @@ namespace Irc4
                 {
                     if (server.IsConnected)
                     {
-                        var task = server.Disconnect();
+                        var task = server.ForceDisconnect();
                         await task;
                     }
                 }
@@ -70,7 +80,7 @@ namespace Irc4
             }
             catch (Exception ex)
             {
-                ExceptionHandler.OnExceptionOccured(this, ex);
+                MessageHandler.OnExceptionOccured(this, ex);
             }
         }
         /// <summary>
@@ -84,34 +94,122 @@ namespace Irc4
                 this.AddServer(serverInfo);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
         public ISec AddServer(ServerInfo info)
         {
-            //同じDisplayNameがあったらダメ
-            foreach (var server in serverList)
+            Server newServer = null;
+            try
             {
-                if (server.DisplayName == info.DisplayName)
-                    return null;
+                if (info == null)
+                    throw new ArgumentNullException("info");
+                if (string.IsNullOrWhiteSpace(info.DisplayName))
+                    throw new ArgumentException("DisplayNameがnullもしくは空白");
+                if (string.IsNullOrWhiteSpace(info.Hostname))
+                    throw new ArgumentException("Hostnameがnullもしくは空白");
+                if (string.IsNullOrWhiteSpace(info.Nickname))
+                    throw new ArgumentException("Nicknameがnullもしくは空白");
+                //同じDisplayNameがあったらダメ
+                foreach (var server in serverList)
+                {
+                    if (server.DisplayName == info.DisplayName)
+                        throw new ArgumentException("このDisplayNameは既に登録済み。");
+                }
+                newServer = new Server();
+                newServer.ConnectSuccess += newServer_ConnectSuccess;
+                newServer.Disconnected += newServer_Disconnected;
+                newServer.ReceiveEvent += newServer_ReceiveEvent;
+                newServer.InfoEvent += newServer_InfoEvent;
+                newServer.ExceptionInfo += newServer_ExceptionInfo;
+                newServer.SetInfo(info);
+                reconnectStateDic.Add(newServer, new ReconnectState());
+                serverList.Add(newServer);
             }
-            var newServer = new Server();
-            newServer.ConnectSuccess += newServer_ConnectSuccess;
-            newServer.Disconnected += newServer_Disconnected;
-            newServer.ReceiveEvent += newServer_ReceiveEvent;
-            newServer.InfoEvent += newServer_InfoEvent;
-            newServer.ExceptionInfo += newServer_ExceptionInfo;
-            newServer.SetInfo(info);
-            serverList.Add(newServer);
-
+            catch (Exception ex)
+            {
+                MessageHandler.OnExceptionOccured(this, ex, ex.Message);
+            }
             return newServer;
         }
 
-        void newServer_Disconnected(object sender, IrcEventArgs e)
+        async void newServer_Disconnected(object sender, IrcEventArgs e)
         {
+            //Debug
+            if (e.IServerChannel.Type == ServerChannelType.SERVER)
+            {
+                var server = (Server)e.IServerChannel;
+                Console.WriteLine("IsDisconnectedExpected:" + server.IsDisconnectedExpected.ToString());
+            }
+
             if (Disconnected != null)
             {
                 Disconnected(sender, e);
             }
+            if (e.IServerChannel.Type == ServerChannelType.SERVER)
+            {
+                var server = (Server)e.IServerChannel;
+                await TryReconnect(server);
+            }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// AddServerでServerを追加する。
+        /// </remarks>
+        Dictionary<Server, ReconnectState> reconnectStateDic = new Dictionary<Server, ReconnectState>();
+        class ReconnectState
+        {
+            /// <summary>
+            /// 再接続を試みた回数
+            /// </summary>
+            public int trialCounter;
+            /// <summary>
+            /// 
+            /// </summary>
+            public System.Timers.Timer Timer;
+            /// <summary>
+            /// 
+            /// </summary>
+            public Server Server;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>意図しない切断と接続に失敗した際に使うつもりで作った</remarks>
+        /// <param name="server"></param>
+        /// <returns></returns>
+        private async Task TryReconnect(Server server)
+        {
+            if (!server.IsDisconnectedExpected)
+            {                
+                Func<ReconnectState, Task> Reconnect = async (s) =>
+                {
+                    s.trialCounter++;
+                    await s.Server.Connect();
+                    MessageHandler.OnMessageEvent(this, "再接続");
+                };
+                //再接続が必要。
+                var state = reconnectStateDic[server];
+                if (state.Timer == null)
+                {
+                    int reconnectIntervalMin = 1;
+                    state.Server = server;
+                    state.Timer = new System.Timers.Timer();
+                    state.Timer.Interval = reconnectIntervalMin * 60 * 1000;
+                    state.Timer.Elapsed += async (sender1, e1) =>
+                    {
+                        await Reconnect(state);
+                    };
+                    state.Timer.Enabled = true;
+                    state.Timer.Start();
+                }
+                await Reconnect(state);
+            }
+        }
         void newServer_ExceptionInfo(object sender, IrcExceptionEventArgs e)
         {
             if (ExceptionInfo != null)
@@ -134,6 +232,16 @@ namespace Irc4
         /// <param name="e"></param>
         void newServer_ConnectSuccess(object sender, IrcEventArgs e)
         {
+            if (e.IServerChannel.Type == ServerChannelType.SERVER)
+            {
+                var state = reconnectStateDic[(Server)e.IServerChannel];
+                if (state.Timer != null)
+                {
+                    state.Timer.Stop();
+                    state.trialCounter = 0;
+                    state.Timer = null;
+                }
+            }
             if (ConnectSuccess != null)
             {
                 ConnectSuccess(sender, e);

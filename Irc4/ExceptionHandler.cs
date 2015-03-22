@@ -9,10 +9,13 @@ namespace Irc4
     /// <summary>
     /// 
     /// </summary>
-    public static class ExceptionHandler
+    public static class MessageHandler
     {
         public delegate void ExceptionOccuredEventHandler(object sender, ExceptionOccuredEventArgs e);
+        public delegate void MessageEventHandler(object sender, MessageEventArgs e);
         public static event ExceptionOccuredEventHandler ExceptionOccured;
+        public static event MessageEventHandler MessageEvent;
+
         public static void OnExceptionOccured(IInfo serverChannel, Log log, Exception ex)
         {
             if (ExceptionOccured != null)
@@ -23,7 +26,12 @@ namespace Irc4
                 ExceptionOccured(serverChannel, args);
             }
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="ex"></param>
+        /// <param name="message"></param>
         public static void OnExceptionOccured(object sender, Exception ex, string message = "")
         {
             if (ExceptionOccured != null)
@@ -35,12 +43,31 @@ namespace Irc4
                 ExceptionOccured(sender, args);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="message"></param>
+        public static void OnMessageEvent(object sender, string message)
+        {
+            if (MessageEvent != null)
+            {
+                var args = new MessageEventArgs();
+                args.DateTime = DateTime.Now;
+                args.Message = message;
+                MessageEvent(sender, args);
+            }
+        }
     }
-
-    public class ExceptionOccuredEventArgs : EventArgs
+    public class MessageEventArgs : EventArgs
     {
         public DateTime DateTime;
-        public Exception Exception;
         public string Message;
+    }
+    public class ExceptionOccuredEventArgs : MessageEventArgs
+    {
+
+        public Exception Exception;
+
     }
 }

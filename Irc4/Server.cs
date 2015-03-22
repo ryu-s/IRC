@@ -13,6 +13,7 @@ namespace Irc4
 
     //[仕様]
     //サーバを切断したときにチャンネルが接続状態にあってもチャンネルのDisconnectedイベントは起こさない。
+    //ChannelListは接続中でも更新可能。他のパラメータは接続時に更新された分は切断後に反映される。
 
 
     /// <summary>
@@ -25,12 +26,15 @@ namespace Irc4
         /// 一旦切断して、次の接続時に使用する情報。接続中には変更できない値が幾つかあるため。
         /// 設定の変更は常にここに入れる。Connect()の最初で本体の情報を更新する。
         /// </summary>
-        private ServerInfo infoModified = new ServerInfo();
-
-        private MyLibrary.MySocket.SocketAsync socket = new MyLibrary.MySocket.SocketAsync();
-
+        private ServerInfo infoModified;
+        /// <summary>
+        /// 
+        /// </summary>
+        private MyLibrary.MySocket.SocketAsync socket;
+        /// <summary>
+        /// 
+        /// </summary>
         private MyLibrary.MySocket.SplitBuffer splitBuffer;
-
         /// <summary>
         /// 接続に成功した。
         /// </summary>
@@ -54,15 +58,41 @@ namespace Irc4
         /// <summary>
         /// 行末文字。
         /// </summary>
-        private const string LineTerminator = "\r\n";
+        private string LineTerminator;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>デシリアライズした時にconstは初期化されるんだろうか</remarks>
+        private const int BUFSIZ = 2048;
         /// <summary>
         /// 
         /// </summary>
         public Server()
+        {      
+            Initialize();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>シリアライザで読み込まれた場合にはコンストラクタが実行されない代わりにこれが呼ばれる。</remarks>
+        /// <param name="c"></param>
+        [System.Runtime.Serialization.OnDeserializing]
+        private void OnDeserializing(System.Runtime.Serialization.StreamingContext c)
         {
+            Initialize();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        private void Initialize()
+        {
+            infoModified = new ServerInfo();
+            socket = new MyLibrary.MySocket.SocketAsync();
+            LineTerminator = "\r\n";
             MyInfo = new UserInfo();
+            IsDisconnectedExpected = false;
             splitBuffer = new MyLibrary.MySocket.SplitBuffer(this, LineTerminator);
-            splitBuffer.AddedEvent += splitBuffer_AddedEvent;            
+            splitBuffer.AddedEvent += splitBuffer_AddedEvent; 
         }
         /// <summary>
         /// 
@@ -87,6 +117,47 @@ namespace Irc4
                 message += "次回接続時に反映されます。";
             InfoHandler(MyLibrary.LogLevel.notice, message);
         }
+        internal Channel AddChannel(ChannelInfo channelInfo)
+        {
+            Channel newChannel = null;
+            try
+            {
+                if (channelInfo == null)
+                    throw new ArgumentNullException("channelInfo");
+                if (!IrcTool.IsChannelName(channelInfo.DisplayName))
+                    throw new Exception("チャンネル名が不正な形式");
+                foreach(var channel in ChannelList)
+                {
+                    if (channelInfo.DisplayName == channel.DisplayName)
+                        throw new Exception("このチャンネル名は既に登録済み。");
+                }
+                newChannel = new Channel();
+                newChannel.Server = this;
+                newChannel.SetInfo(channelInfo);
+
+                //チャンネルリストに登録する。
+                var list = base.ChannelList.ToList();
+                list.Add(newChannel);
+                base.ChannelList = list.ToArray();
+
+                OnAddChannel(newChannel);
+            }
+            catch (Exception ex)
+            {
+                InfoHandler(MyLibrary.LogLevel.error, ex.Message, ex);
+            }
+            return newChannel;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="channel"></param>
+        void OnAddChannel(Channel channel)
+        {
+            //TODO:チャンネルが追加されたら発生するイベントを追加する。
+            channel.ConnectSuccess += channel_ConnectSuccess;
+            channel.Disconnected += channel_Disconnected;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -95,6 +166,7 @@ namespace Irc4
         {
             var info = new ServerInfo();
             info.Clone(infoModified);
+            info.ChannelList = base.ChannelList;
             return info;
         }
         /// <summary>
@@ -154,77 +226,7 @@ namespace Irc4
                     base.Username = value;
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-//        internal new List<Channel> ChannelList
-//        {
-//            get
-//            {
-//                //List<ISec> chanList = null;
-//                //if (this.IsConnected)
-//                //    chanList = base.ChannelList;
-//                //else
-//                //    chanList = infoModified.ChannelList;
-//                //var list = new List<Channel>();
-//                //foreach(var channelISec in chanList)
-//                //{
-//                //    list.Add((Channel)channelISec);
-//                //}
-//                //return list;
-////                return base.ChannelList.AsEnumerable().OfType<Channel>().ToList();
-//                var a = base.ChannelList;
-//                var b = a.Cast<Channel>().ToList();
-//                string[] ss = null;
-                
-//                return b;
-//            }
-//            set
-//            {
-//                //var list = new List<ISec>();
-//                //foreach (var channel in value)
-//                //{
-//                //    list.Add(channel);
-//                //}
-//                //infoModified.ChannelList = list;
-//                //if(!IsConnected)
-//                //    base.ChannelList = list;
-////                base.ChannelList = value.AsEnumerable().OfType<ISec>().ToList();
-//                var a = value;
-//                var b = a.Cast<ISec>().ToList();
-//                base.ChannelList = b;
-//            }
-//        }
-        internal Channel AddChannel(ChannelInfo channelInfo)
-        {
-            Channel newChannel = null;
-            try
-            {
-                newChannel = new Channel();
-                //TODO:
-                newChannel.Server = this;
-                newChannel.SetInfo(channelInfo);
-                var list = base.ChannelList.ToList();
-                list.Add(newChannel);
-                base.ChannelList = list.ToArray();
-                OnAddChannel(newChannel);
-            }
-            catch (Exception ex)
-            {
-                InfoHandler(MyLibrary.LogLevel.error, ex.Message, ex);
-            }
-            return newChannel;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="channel"></param>
-        void OnAddChannel(Channel channel)
-        {
-            //TODO:チャンネルが追加されたら発生するイベントを追加する。
-            channel.ConnectSuccess += channel_ConnectSuccess;
-            channel.Disconnected += channel_Disconnected;
-        }
+
 
         void channel_Disconnected(object sender, IrcEventArgs e)
         {
@@ -313,12 +315,25 @@ namespace Irc4
                 InfoEvent(this, args);
             }
         }
+        private bool isDisconnectedExpected;
+        internal bool IsDisconnectedExpected
+        {
+            get
+            {
+                return isDisconnectedExpected;
+            }
+            private set
+            {
+                isDisconnectedExpected = value;
+            }
+        }
         /// <summary>
         /// 
         /// </summary>
         public async Task Connect()
         {
             var fatalErrorOccured = false;
+            IsDisconnectedExpected = false;
             //Update my info
             this.Clone(infoModified);
             //存在しないホスト名だった場合に例外を投げるが、接続試行中にホスト名を変更すると、catch内で間違っている方のホスト名が参照できない。
@@ -340,7 +355,7 @@ namespace Irc4
                         message = "接続が拒否された。サーバソフトが起動してないか、正常に機能してない。";
                         break;
                     case SocketError.TimedOut:
-                        message = "Time out. Portが間違っているかも？ Port：" + this.Port;
+                        message = string.Format("Time out. HostもしくはPortが間違っているかも？ Host:{0} Port：{1}", this.Hostname,this.Port);
                         break;
                     case SocketError.IsConnected:
                         message = "このソケットは接続済み。";
@@ -362,7 +377,10 @@ namespace Irc4
                 fatalErrorOccured = true;
             }
             if (fatalErrorOccured)
+            {
+                //ConnectionFailed
                 return;
+            }
 
             //コマンドの送信に成功したらtrueが返ってくるから反転させる必要がある。
             fatalErrorOccured = !await this.SendCmd(string.Format("NICK {0}\r\nUSER {1} 8 * :{2}\r\n", this.Nickname, this.Username, this.Realname));
@@ -378,9 +396,9 @@ namespace Irc4
                 args.logLevel = MyLibrary.LogLevel.notice;
                 args.IServerChannel = this;
                 ConnectSuccess(this, args);
-            }
-            var buffer = new byte[2048];
-            var hostEnc = Encoding.UTF8;
+            }            
+            var buffer = new byte[BUFSIZ];
+            var hostEnc = this.Encoding;
             var sb = new StringBuilder();
             int n = 0;
             do
@@ -407,7 +425,8 @@ namespace Irc4
                             message = "Not Implemented SocketErrorCode:" + ex.SocketErrorCode.ToString();
                             break;
                     }
-                    InfoHandler(MyLibrary.LogLevel.error, message, ex);
+                    if(!IsDisconnectedExpected)
+                        InfoHandler(MyLibrary.LogLevel.error, message, ex);
                     fatalErrorOccured = true;
                 }
                 catch (Exception ex)
@@ -459,6 +478,14 @@ namespace Irc4
             if (!fatalErrorOccured)
                 Console.WriteLine("正常終了");
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task Quit()
+        {
+            await SendCmd("QUIT");
+        }
         void OnDisconnected()
         {
             if (Disconnected != null && !IsConnected)
@@ -502,12 +529,11 @@ namespace Irc4
                 channel = (Channel)GetChannel(log.ChannelName);
                 if (channel == null)
                 {
-                    if (log.Command == Command.JOIN)
+                    if (log.Command == Command.JOIN || log.Command == Command.RPL_NAMREPLY)
                     {
                         var newChannelInfo = new ChannelInfo();
                         newChannelInfo.DisplayName = log.ChannelName;
                         channel = AddChannel(newChannelInfo);
-                        //TODO:ここで追加したチャンネルが設定ファイルに追加されていない。
                     }
                     else
                     {
@@ -573,7 +599,7 @@ namespace Irc4
         /// <returns></returns>
         public ISec GetChannel(string displayName)
         {
-            foreach(var channel in this.infoModified.ChannelList)
+            foreach(var channel in this.ChannelList)
             {
                 if (channel.DisplayName.ToLower() == displayName.ToLower())
                     return channel;
@@ -617,12 +643,12 @@ namespace Irc4
             await SendCmd("PONG " + receiver);
         }
         /// <summary>
-        /// 
+        /// 強制的に切断する。IRC的にはQuit()を利用するほうが良いかも。
         /// </summary>
         /// <returns></returns>
-        public async Task Disconnect()
+        internal async Task ForceDisconnect()
         {
-
+            IsDisconnectedExpected = true;
             try
             {
                 await socket.DisconnectAsync();
@@ -642,6 +668,18 @@ namespace Irc4
                 InfoHandler(MyLibrary.LogLevel.error, message, ex);
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async Task Disconnect()
+        {
+            IsDisconnectedExpected = true;
+            await Quit();
+        }
+        /// <summary>
+        /// 
+        /// </summary>
         public void DisconnectSync()
         {
             try

@@ -11,23 +11,52 @@ using System.Windows.Forms;
 namespace Irc4TestForm
 {
     public partial class Form1 : Form
-    {
-        Irc4.IrcManager ircManager = new Irc4.IrcManager();
-        Irc4.ISec currentServer;
-        Irc4.ISec currentChannelInterface;
+    {        
+        Irc4.ISec currentServer_;
+        Irc4.ISec currentServer
+        {
+            get
+            {
+                var s = (currentServer_ == null) ? "null" : currentServer_.DisplayName;
+                toolStripStatusLabel1.Text = "server:" + s;
+                return currentServer_;
+            }
+            set
+            {
+                currentServer_ = value;
+            }
+        }
+        Irc4.ISec currentChannelInterface_;
+        Irc4.ISec currentChannelInterface
+        {
+            get
+            {
+                return currentChannelInterface_;
+            }
+            set
+            {
+                var s = (currentChannelInterface_ == null) ? "null" : currentChannelInterface_.DisplayName;
+                toolStripStatusLabel2.Text = "channel:" + s;
+                currentChannelInterface_ = value;
+            }
+        }
         Dictionary<Irc4.ISec, Irc4Control.MyDataTable> tableDic2 = new Dictionary<Irc4.ISec, Irc4Control.MyDataTable>();
         public Form1()
         {
             InitializeComponent();
-
+            
             comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
 
-            ircManager.ConnectSuccess += ircManager_ConnectSuccess;
-            ircManager.Disconnected += ircManager_Disconnected;
-            ircManager.ReceiveEvent += ircManager_ReceiveEvent;
-            ircManager.InfoEvent += ircManager_InfoEvent;
-            ircManager.ExceptionInfo += ircManager_ExceptionInfo;
+            Irc4.MessageHandler.ExceptionOccured += ExceptionHandler_ExceptionOccured;
+            Irc4.MessageHandler.MessageEvent += MessageHandler_MessageEvent;
+
+            Irc4.IrcManager.Instance.ConnectSuccess += ircManager_ConnectSuccess;
+            Irc4.IrcManager.Instance.Disconnected += ircManager_Disconnected;
+            Irc4.IrcManager.Instance.ReceiveEvent += ircManager_ReceiveEvent;
+            Irc4.IrcManager.Instance.InfoEvent += ircManager_InfoEvent;
+            Irc4.IrcManager.Instance.ExceptionInfo += ircManager_ExceptionInfo;
         }
+
 
 
         /// <summary>
@@ -57,21 +86,49 @@ namespace Irc4TestForm
                 btnDisconnect.Enabled = server.IsConnected;
 
                 comboBoxCurrentChannel.Items.Clear();
-                if (ircManager.GetChannelList(server).Count > 0)
+                if (Irc4.IrcManager.Instance.GetChannelList(server).Count > 0)
                 {
                     comboBoxCurrentChannel.Enabled = true;
-                    foreach (var channel in ircManager.GetChannelList(server))
+                    foreach (var channel in Irc4.IrcManager.Instance.GetChannelList(server))
                     {
                         comboBoxCurrentChannel.Items.Add(channel);
                     }
-                    if (comboBoxCurrentChannel.Items.Count > 0)
-                        comboBoxCurrentChannel.SelectedIndex = 0;
+                    SetComboBoxSelectedIndex(comboBoxCurrentChannel, 0);
                 }
                 else
                 {
                     ChangeCurrentChannel(null);
                 }
 
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="comboBox"></param>
+        /// <param name="index"></param>
+        void SetComboBoxSelectedIndex(ComboBox comboBox, int index)
+        {
+            if (comboBox.Items.Count > 0)
+            {
+                if (comboBox.Items.Count == 1)
+                {
+                    //アイテムが一つしか無い場合、コンボボックスのSelectedIndexChangedが起こらないため、必要な処理をする。
+                    var item = comboBox.Items[0];
+                    var isec = (Irc4.ISec)item;
+                    if (isec.Type == Irc4.ServerChannelType.CHANNEL)
+                        ChangeCurrentChannel(isec);
+                    else
+                        ChangeCurrent(isec);
+                    comboBox.SelectedIndex = 0;
+                    comboBox.Text = item.ToString();
+//                    comboBox.SelectedItem = item;
+//                    comboBox.SelectedText = item.ToString();
+                }
+                else
+                {
+                    comboBox.SelectedIndex = index;
+                }
             }
         }
         void ChangeCurrentChannel(Irc4.ISec channel)
@@ -121,14 +178,13 @@ namespace Irc4TestForm
         protected override void OnLoad(EventArgs e)
         {
             //設定値の読み込み。
-            ircManager.Load();
+            Irc4.IrcManager.Instance.Load();
 
-            foreach(Irc4.ISec server in ircManager.ServerList)
+            foreach(Irc4.ISec server in Irc4.IrcManager.Instance.ServerList)
             {
                 AddServer(server);
             }
-            if (comboBox1.Items.Count > 0)
-                comboBox1.SelectedIndex = 0;
+            SetComboBoxSelectedIndex(comboBox1, 0);
             btnCancelCreateNewServer.Enabled = false;
             btnAddServer.Enabled = false;
             btnCancelCreateNewChannel.Enabled = false;
@@ -144,7 +200,7 @@ namespace Irc4TestForm
             tableDic2.Add(server, new Irc4Control.MyDataTable());
             if (currentServer == null)
                 currentServer = server;
-            foreach (var channel in ircManager.GetChannelList(server))
+            foreach (var channel in Irc4.IrcManager.Instance.GetChannelList(server))
             {
                 AddChannel(channel);
             }
@@ -171,7 +227,7 @@ namespace Irc4TestForm
                 e.Cancel = true;
                 try
                 {
-                    await ircManager.Save();
+                    await Irc4.IrcManager.Instance.Save();
                 }
                 catch (Exception ex)
                 {
@@ -205,7 +261,32 @@ namespace Irc4TestForm
             else
                 action();
         }
-
+        void ExceptionHandler_ExceptionOccured(object sender, Irc4.ExceptionOccuredEventArgs e)
+        {
+            Action action = () =>
+            {
+                this.textBox1.Text += string.Format("{0} [{1}] {2}", e.DateTime.ToString("HH:mm:ss"), sender.ToString(), e.Message) + Environment.NewLine;
+                this.textBox1.SelectionStart = this.textBox1.TextLength - 1;
+                this.textBox1.ScrollToCaret();
+            };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
+        }
+        void MessageHandler_MessageEvent(object sender, Irc4.MessageEventArgs e)
+        {
+            Action action = () =>
+            {
+                this.textBox1.Text += string.Format("{0} [{1}] {2}", e.DateTime.ToString("HH:mm:ss"), sender.ToString(), e.Message) + Environment.NewLine;
+                this.textBox1.SelectionStart = this.textBox1.TextLength - 1;
+                this.textBox1.ScrollToCaret();
+            };
+            if (InvokeRequired)
+                Invoke(action);
+            else
+                action();
+        }
         void ircManager_InfoEvent(object sender, Irc4.IrcInfoEventArgs e)
         {
             Action action = () =>
@@ -341,7 +422,7 @@ namespace Irc4TestForm
         {
             if (currentServer != null)
             {
-                await ircManager.SendCmd(currentServer, this.textBox2.Text);
+                await Irc4.IrcManager.Instance.SendCmd(currentServer, this.textBox2.Text);
                 textBox2.Text = "";
             }
         }
@@ -360,7 +441,7 @@ namespace Irc4TestForm
             if (currentServer != null)
             {
                 var serverInfo = CreateServerInfo(txtDisplayName.Text, txtHost.Text, txtNickname.Text);
-                ircManager.SetInfo(currentServer, serverInfo);
+                Irc4.IrcManager.Instance.SetInfo(currentServer, serverInfo);
                 for(int i = 0; i < comboBox1.Items.Count ; i++)
                 {
                     var item = comboBox1.Items[i];
@@ -424,7 +505,7 @@ namespace Irc4TestForm
             btnConnect.Enabled = false;
             btnDisconnect.Enabled = false;
             btnAddServer.Enabled = true;
-            currentServer = null;
+//            currentServer = null;
             txtDisplayName.Text = "";
             txtHost.Text = "";
             txtNickname.Text = "";
@@ -435,18 +516,7 @@ namespace Irc4TestForm
             btnCreateNewServer.Enabled = true;
             btnAddServer.Enabled = false;
             btnCancelCreateNewServer.Enabled = false;
-            if (comboBox1.Items.Count > 0)
-            {
-                if (comboBox1.Items.Count == 1)
-                {
-                    //アイテムが一つしか無い場合、コンボボックスのSelectedIndexChangedが起こらないため、必要な処理をする。
-                    ChangeCurrent((Irc4.ISec)comboBox1.Items[0]);
-                }
-                else
-                {
-                    comboBox1.SelectedIndex = 0;
-                }
-            }
+            ChangeCurrent(currentServer);
         }
         /// <summary>
         /// 
@@ -459,9 +529,15 @@ namespace Irc4TestForm
             var host = txtHost.Text;
             var nickname = txtNickname.Text;
             var serverInfo = CreateServerInfo(displayName, host, nickname);
-            var server = ircManager.AddServer(serverInfo);
+            var server = Irc4.IrcManager.Instance.AddServer(serverInfo);
             if (server != null)
+            {                
+                btnCreateNewChannel.Enabled = true;
+                btnAddChannel.Enabled = false;
+                btnCancelCreateNewChannel.Enabled = false;
                 AddServer(server);
+                ChangeCurrent(server);
+            }
         }
 
         private void btnCreateNewChannel_Click(object sender, EventArgs e)
@@ -469,7 +545,8 @@ namespace Irc4TestForm
             btnCreateNewChannel.Enabled = false;
             btnAddChannel.Enabled = true;
             btnCancelCreateNewChannel.Enabled = true;
-            ChangeCurrentChannel(null);
+            txtChannelDisplayName.Text = "";
+//            ChangeCurrentChannel(null);
         }
 
         private void btnAddChannel_Click(object sender, EventArgs e)
@@ -478,10 +555,20 @@ namespace Irc4TestForm
             {
                 var displayName = txtChannelDisplayName.Text;
                 var channelInfo = CreateChannelInfo(displayName);
-                var channel = ircManager.AddChannel(currentServer, channelInfo);
+
+                var currentChan = currentChannelInterface;
+                Irc4.ISec channel = Irc4.IrcManager.Instance.AddChannel(currentServer, channelInfo);
                 if (channel != null)
                 {
+                    btnCreateNewChannel.Enabled = true;
+                    btnAddChannel.Enabled = false;
+                    btnCancelCreateNewChannel.Enabled = false;
                     AddChannel(channel);
+                    ChangeCurrentChannel(channel);
+                }
+                else
+                {
+                    ChangeCurrentChannel(currentChan);
                 }
             }
         }
@@ -491,18 +578,7 @@ namespace Irc4TestForm
             btnCreateNewChannel.Enabled = true;
             btnAddChannel.Enabled = false;
             btnCancelCreateNewChannel.Enabled = false;
-            if (comboBoxCurrentChannel.Items.Count > 0)
-            {
-                if (comboBoxCurrentChannel.Items.Count == 1)
-                {
-                    //アイテムが一つしか無い場合、コンボボックスのSelectedIndexChangedが起こらないため、必要な処理をする。
-                    ChangeCurrentChannel((Irc4.ISec)comboBoxCurrentChannel.Items[0]);
-                }
-                else
-                {
-                    comboBoxCurrentChannel.SelectedIndex = 0;
-                }
-            }
+            SetComboBoxSelectedIndex(comboBoxCurrentChannel, 0);
         }
 
 

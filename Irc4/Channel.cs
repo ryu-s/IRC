@@ -77,11 +77,19 @@ namespace Irc4
         {
             Initialize();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>シリアライザで読み込まれた場合にはコンストラクタが実行されない代わりにこれが呼ばれる。</remarks>
+        /// <param name="c"></param>
         [System.Runtime.Serialization.OnDeserializing]
         private void OnDeserializing(System.Runtime.Serialization.StreamingContext c)
         {
             Initialize();
         }
+        /// <summary>
+        /// 
+        /// </summary>
         private void Initialize()
         {
             UserList = new UserList();
@@ -108,7 +116,7 @@ namespace Irc4
         }
 
         /// <summary>
-        /// 
+        /// Quitコマンドを受け取る。
         /// </summary>
         /// <param name="log"></param>
         public void QuitHandler(Log log)
@@ -118,7 +126,7 @@ namespace Irc4
 
         }
         /// <summary>
-        /// 
+        /// NICKコマンドを受け取る。
         /// </summary>
         /// <param name="log"></param>
         public void NickHandler(Log log)
@@ -127,6 +135,10 @@ namespace Irc4
                 throw new ArgumentException("log");
 
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="log"></param>
         public void SetLog(Log log)
         {
             if(log.Command == Command.JOIN)

@@ -65,7 +65,16 @@ namespace Irc4
         /// コードページ。Encodingだとシリアライズできない。確か。
         /// </summary>
         public int CodePage { get; set; }
-        
+        /// <summary>
+        /// 
+        /// </summary>
+        public Encoding Encoding
+        {
+            get
+            {
+                return Encoding.GetEncoding(CodePage);
+            }
+        }        
         public string Password { get; set; }
         public string Nickname { get; set; }
         public string Username { get; set; }
