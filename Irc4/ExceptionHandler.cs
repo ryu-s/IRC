@@ -66,8 +66,6 @@ namespace Irc4
     }
     public class ExceptionOccuredEventArgs : MessageEventArgs
     {
-
         public Exception Exception;
-
     }
 }

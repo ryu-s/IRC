@@ -166,7 +166,6 @@ namespace Irc4TestForm
         /// <param name="server"></param>
         void SetServerTextbox(Irc4.ServerInfo server)
         {
-            var b = InvokeRequired;
             txtDisplayName.Text = server.DisplayName;
             txtNickname.Text = server.Nickname;
             txtHost.Text = server.Hostname;

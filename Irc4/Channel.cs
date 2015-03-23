@@ -123,7 +123,6 @@ namespace Irc4
         {
             if (log == null || log.Command != Command.QUIT)
                 throw new ArgumentException("log");
-
         }
         /// <summary>
         /// NICKコマンドを受け取る。
@@ -133,7 +132,6 @@ namespace Irc4
         {
             if (log == null || log.Command != Command.NICK)
                 throw new ArgumentException("log");
-
         }
         /// <summary>
         /// 

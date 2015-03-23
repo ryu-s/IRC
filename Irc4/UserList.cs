@@ -33,7 +33,6 @@ namespace Irc4
         /// ユーザの数
         /// </summary>
         public int Count { get { return list.Count; } }
-
         /// <summary>
         /// 
         /// </summary>
@@ -158,9 +157,6 @@ namespace Irc4
             else
             {
             }
-
         }
-
-
     }
 }
